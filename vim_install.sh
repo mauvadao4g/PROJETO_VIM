@@ -91,6 +91,23 @@ check_ai_deps() {
 	fi
 }
 
+install_bash_lsp() {
+	if need_cmd bash-language-server; then
+		log "bash-language-server já instalado."
+		return
+	fi
+	if ! need_cmd npm; then
+		warn "npm não encontrado; pulando instalação do bash-language-server (autocomplete/go-to-definition ficarão desativados)."
+		return
+	fi
+	log "Instalando bash-language-server via npm (autocomplete/go-to-definition/hover)..."
+	if $SUDO npm install -g bash-language-server; then
+		log "bash-language-server instalado."
+	else
+		warn "Falha ao instalar bash-language-server; autocomplete/go-to-definition ficarão desativados (o lint com shellcheck continua funcionando normalmente)."
+	fi
+}
+
 MARKER="$VIM_DIR/.vim_install_managed"
 
 backup_existing() {
@@ -189,6 +206,13 @@ Git (vim-fugitive):
   <espaço> g c   -> commit    <espaço> g p   -> push
   <espaço> g P   -> pull      <espaço> g l   -> log
 
+Autocomplete / go-to-definition / hover (bash-language-server via ALE):
+  Ctrl-space     -> autocomplete manual   <espaço> l d -> ir para definição
+  <espaço> l h   -> ver documentação (hover)
+  <espaço> l r   -> ver referências
+  (só funciona dentro de um repositório git; o shellcheck continua
+   funcionando em qualquer arquivo, com ou sem git)
+
 Use ./gerar_snippets.sh para adicionar novos snippets rapidamente.
 
 Para reinstalar/replicar esta configuração em outra máquina, copie a
@@ -200,6 +224,7 @@ EOF
 main() {
 	install_packages
 	check_ai_deps
+	install_bash_lsp
 	backup_existing
 	deploy_files
 	install_vim_plug

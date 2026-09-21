@@ -36,6 +36,8 @@ O script instala tudo sozinho:
 5. Verifica (sem instalar nada de forma invasiva) se `Node.js >= 18` e o
    comando `claude` estão disponíveis, avisando caso faltem — são
    necessários para o GitHub Copilot e para os atalhos de Claude.
+6. Instala o `bash-language-server` via `npm install -g` (autocomplete,
+   ir para definição e hover para arquivos `.sh`).
 
 Se já existir uma configuração de Vim anterior (não gerenciada por este
 script), ela é movida para `~/.vim_backup_<data>_<hora>` antes de aplicar a
@@ -103,6 +105,24 @@ Tema padrão: **Dracula**. Outros temas escuros incluídos:
   na coluna de sinais e via `:ALEInfo` / `<leader>` de navegação padrão do ALE.
 - **shfmt**: formata o arquivo automaticamente ao salvar (`ale_fix_on_save`),
   usando indentação de 2 espaços e `case` indentado (`-i 2 -ci`).
+
+## Autocomplete, ir para definição e hover (bash-language-server)
+
+Além do shellcheck, o ALE roda o `bash-language-server` (instalado via
+`npm i -g bash-language-server`, já incluso no `vim_install.sh`) para dar
+autocomplete de verdade, navegação e documentação ao passar o cursor.
+
+| Atalho         | Ação                                         |
+|----------------|-------------------------------------------------|
+| `Ctrl-space`   | Autocomplete manual (além do popup automático)   |
+| `<espaço> l d` | Ir para a definição da função/variável           |
+| `<espaço> l h` | Ver documentação (hover) do item sob o cursor    |
+| `<espaço> l r` | Ver referências (onde é usado)                   |
+
+> Importante: o `bash-language-server` só inicia dentro de um repositório
+> git (ele usa a raiz do `.git` como raiz do projeto). Fora de um repo git,
+> só o shellcheck continua ativo normalmente. `Tab` continua reservado
+> para o UltiSnips; o autocomplete não interfere nos snippets.
 
 ## Snippets de Bash disponíveis
 

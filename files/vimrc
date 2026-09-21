@@ -123,13 +123,24 @@ let g:airline_theme = 'dracula'
 let g:airline_powerline_fonts = 1
 
 " ---------- ALE (lint/format para bash) ----------
-let g:ale_linters = { 'sh': ['shellcheck'] }
+" 'language_server' = bash-language-server: autocomplete, go-to-definition,
+" hover e referências. Precisa do bash-language-server instalado (npm),
+" ver vim_install.sh. O shellcheck continua rodando em paralelo pro lint.
+let g:ale_linters = { 'sh': ['shellcheck', 'language_server'] }
 let g:ale_fixers = { 'sh': ['shfmt'], '*': ['remove_trailing_lines', 'trim_whitespace'] }
 let g:ale_sh_shfmt_options = '-i 2 -ci'
 let g:ale_fix_on_save = 1
 let g:ale_sign_error = 'x'
 let g:ale_sign_warning = '!'
 let g:ale_echo_msg_format = '[%linter%] %s'
+let g:ale_completion_enabled = 1
+
+" <C-space> aciona o autocomplete manualmente (Tab continua do UltiSnips)
+inoremap <silent> <C-space> <C-x><C-o>
+
+nnoremap <leader>ld :ALEGoToDefinition<CR>
+nnoremap <leader>lh :ALEHover<CR>
+nnoremap <leader>lr :ALEFindReferences<CR>
 
 " ---------- UltiSnips ----------
 let g:UltiSnipsExpandTrigger = '<tab>'

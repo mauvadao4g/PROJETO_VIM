@@ -44,7 +44,20 @@ shfmt              Formata o arquivo automaticamente ao salvar
                    (indentacao 2 espacos, case indentado)
 
 ----------------------------------------------------------------------
-5. GITHUB COPILOT
+5. AUTOCOMPLETE / GO-TO-DEFINITION / HOVER (bash-language-server)
+----------------------------------------------------------------------
+Ctrl-space      Autocomplete manual (alem do popup automatico)
+<espaco> l d    Ir para a definicao da funcao/variavel
+<espaco> l h    Ver documentacao (hover) do item sob o cursor
+<espaco> l r    Ver referencias (onde e usado)
+
+Obs: so funciona dentro de um repositorio git (usa a raiz do .git como
+raiz do projeto). Fora de um repo git, so o shellcheck fica ativo.
+Requer bash-language-server instalado (via npm, ja incluso no
+vim_install.sh). Tab continua reservado para o UltiSnips.
+
+----------------------------------------------------------------------
+6. GITHUB COPILOT
 ----------------------------------------------------------------------
 :Copilot setup       Autenticar (rodar uma vez por maquina, via navegador)
 Ctrl-l (insert)      Aceitar a sugestao do Copilot
@@ -59,7 +72,7 @@ remapeado para Ctrl-l (evita o conflito classico entre os dois plugins).
 Requer Node.js >= 18.
 
 ----------------------------------------------------------------------
-6. CLAUDE (Claude Code CLI)
+7. CLAUDE (Claude Code CLI)
 ----------------------------------------------------------------------
 <espaco> a c    Abrir o Claude interativo (claude) em um split
 <espaco> a e    Explicar o arquivo atual (normal) ou a selecao (visual)
@@ -74,7 +87,7 @@ O resultado aparece em um split de terminal embaixo; feche com :q ou Ctrl-w c.
 Requer o comando "claude" instalado e autenticado no PATH.
 
 ----------------------------------------------------------------------
-7. GIT (GitHub, via vim-fugitive)
+8. GIT (GitHub, via vim-fugitive)
 ----------------------------------------------------------------------
 <espaco> g i    Inicializar repositorio (git init)
 <espaco> g s    Status (git status, painel interativo)
@@ -89,7 +102,7 @@ No painel de status (<espaco> g s): s = stage, u = unstage, cc = commit,
 g? = ajuda completa do fugitive.
 
 ----------------------------------------------------------------------
-8. SNIPPETS DE BASH  (digite o gatilho + Tab)
+9. SNIPPETS DE BASH  (digite o gatilho + Tab)
 ----------------------------------------------------------------------
 
 -- Estrutura / controle de fluxo --
