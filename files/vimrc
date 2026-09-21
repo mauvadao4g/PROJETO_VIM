@@ -1,0 +1,208 @@
+"==============================================================
+" .vimrc — foco em Bash script, tema Dracula + temas escuros
+" Gerenciado por vim_install.sh (repositório PROJETO_VIM)
+" NÃO editar manualmente para mudanças permanentes: edite
+" files/vimrc no repositório e rode vim_install.sh novamente.
+"==============================================================
+
+" ---------- Bootstrap do vim-plug ----------
+let s:plug_file = expand('~/.vim/autoload/plug.vim')
+if empty(glob(s:plug_file))
+  let s:plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  silent execute '!curl -fLo ' . s:plug_file . ' --create-dirs ' . s:plug_url
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+
+" ---- Temas escuros ----
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'morhetz/gruvbox'
+Plug 'arcticicestudio/nord-vim'
+Plug 'joshdick/onedark.vim'
+Plug 'tomasr/molokai'
+Plug 'drewtempelmeyer/palenight.vim'
+Plug 'sainnhe/everforest'
+
+" ---- Interface ----
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'preservim/nerdtree'
+Plug 'airblade/vim-gitgutter'
+Plug 'Yggdroot/indentLine'
+
+" ---- Bash / Shell script ----
+Plug 'arzg/vim-sh'
+Plug 'dense-analysis/ale'
+
+" ---- Snippets ----
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+
+" ---- Produtividade geral ----
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
+Plug 'jiangmiao/auto-pairs'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+" ---- IA: GitHub Copilot ----
+Plug 'github/copilot.vim'
+
+call plug#end()
+
+" ---------- Configurações gerais ----------
+syntax on
+filetype plugin indent on
+set encoding=utf-8
+set nocompatible
+set number relativenumber
+set cursorline
+set mouse=a
+set clipboard=unnamedplus
+set expandtab tabstop=2 shiftwidth=2 softtabstop=2
+set smartindent autoindent
+set incsearch hlsearch ignorecase smartcase
+set wildmenu wildmode=longest:full,full
+set scrolloff=8 sidescrolloff=8
+set updatetime=300
+set signcolumn=yes
+set noswapfile nobackup
+set undofile
+set undodir=~/.vim/undo//
+set splitright splitbelow
+set termguicolors
+set background=dark
+set laststatus=2
+
+if !isdirectory(expand('~/.vim/undo'))
+  call mkdir(expand('~/.vim/undo'), 'p')
+endif
+
+let mapleader = ' '
+
+" ---------- Temas ----------
+let g:dracula_colorterm = 0
+let g:gruvbox_contrast_dark = 'hard'
+let g:everforest_background = 'hard'
+let g:palenight_terminal_italics = 1
+
+let g:colo_list = ['dracula', 'gruvbox', 'nord', 'onedark', 'molokai', 'palenight', 'everforest']
+let g:colo_idx = 0
+
+function! s:SetColo(name)
+  try
+    execute 'colorscheme ' . a:name
+  catch /.*/
+    echohl WarningMsg | echom 'Tema indisponivel ainda (rode :PlugInstall): ' . a:name | echohl None
+    return
+  endtry
+  try
+    execute 'AirlineTheme ' . a:name
+  catch /.*/
+  endtry
+  echo 'Tema atual: ' . a:name
+endfunction
+
+function! NextColo()
+  let g:colo_idx = (g:colo_idx + 1) % len(g:colo_list)
+  call s:SetColo(g:colo_list[g:colo_idx])
+endfunction
+
+function! PrevColo()
+  let g:colo_idx = (g:colo_idx - 1 + len(g:colo_list)) % len(g:colo_list)
+  call s:SetColo(g:colo_list[g:colo_idx])
+endfunction
+
+nnoremap <F5> :call PrevColo()<CR>
+nnoremap <F6> :call NextColo()<CR>
+
+silent! colorscheme dracula
+let g:airline_theme = 'dracula'
+let g:airline_powerline_fonts = 1
+
+" ---------- ALE (lint/format para bash) ----------
+let g:ale_linters = { 'sh': ['shellcheck'] }
+let g:ale_fixers = { 'sh': ['shfmt'], '*': ['remove_trailing_lines', 'trim_whitespace'] }
+let g:ale_sh_shfmt_options = '-i 2 -ci'
+let g:ale_fix_on_save = 1
+let g:ale_sign_error = 'x'
+let g:ale_sign_warning = '!'
+let g:ale_echo_msg_format = '[%linter%] %s'
+
+" ---------- UltiSnips ----------
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<c-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
+let g:UltiSnipsSnippetDirectories = ['UltiSnips']
+let g:UltiSnipsEditSplit = 'vertical'
+
+" ---------- NERDTree ----------
+nnoremap <C-n> :NERDTreeToggle<CR>
+let g:NERDTreeShowHidden = 1
+let g:NERDTreeMinimalUI = 1
+
+" ---------- fzf ----------
+nnoremap <C-p> :Files<CR>
+nnoremap <leader>f :Rg<CR>
+nnoremap <leader>b :Buffers<CR>
+
+" ---------- Atalhos gerais ----------
+nnoremap <leader>w :w<CR>
+nnoremap <leader>q :q<CR>
+vnoremap <leader>c :Commentary<CR>
+nnoremap <leader>c :Commentary<CR>
+
+" ---------- indentLine ----------
+let g:indentLine_char = '|'
+let g:indentLine_color_term = 60
+
+" ---------- GitHub Copilot ----------
+" <Tab> continua reservado para o UltiSnips; Copilot usa <C-l> para aceitar.
+let g:copilot_no_tab_map = v:true
+imap <silent><script><expr> <C-l> copilot#Accept("\<CR>")
+" <M-]> proxima sugestao, <M-[> sugestao anterior, <C-]> descartar (padroes do plugin)
+" Primeiro uso em cada máquina: rode :Copilot setup e siga a autenticação pelo navegador.
+
+" ---------- Claude (Claude Code CLI) ----------
+" Requer o comando 'claude' instalado e autenticado no PATH.
+function! s:ClaudeChat()
+  botright 15split
+  call term_start(['claude'], {'curwin': 1})
+endfunction
+command! ClaudeChat call s:ClaudeChat()
+
+function! s:ClaudeAsk(prompt) range
+  let l:tmpin = tempname()
+  execute a:firstline . ',' . a:lastline . 'write! ' . fnameescape(l:tmpin)
+  botright 15split
+  " term_start com comando em lista evita qualquer problema de escaping de
+  " aspas/espaços (:terminal com string só faz split ingênuo por espaço).
+  call term_start(['claude', '-p', a:prompt], {
+        \ 'curwin': 1,
+        \ 'in_io': 'file',
+        \ 'in_name': l:tmpin,
+        \ 'exit_cb': {j, s -> delete(l:tmpin)},
+        \ })
+endfunction
+command! -range=% -nargs=+ ClaudeAsk <line1>,<line2>call s:ClaudeAsk(<q-args>)
+
+nnoremap <leader>ac :ClaudeChat<CR>
+nnoremap <leader>ae :ClaudeAsk Explique o que este código faz, de forma clara e objetiva.<CR>
+vnoremap <leader>ae :ClaudeAsk Explique o que este trecho de código faz.<CR>
+nnoremap <leader>ar :ClaudeAsk Revise este script: aponte bugs, riscos de segurança e sugestões de melhoria.<CR>
+vnoremap <leader>ar :ClaudeAsk Revise este trecho: aponte bugs e sugestões de melhoria.<CR>
+nnoremap <leader>af :ClaudeAsk Corrija os bugs deste script e explique o que foi corrigido.<CR>
+nnoremap <leader>aa :ClaudeAsk
+vnoremap <leader>aa :ClaudeAsk
+
+" ---------- Git (vim-fugitive) ----------
+nnoremap <leader>gi :Git init<CR>
+nnoremap <leader>gs :Git<CR>
+nnoremap <leader>ga :Git add %<CR>
+nnoremap <leader>gA :Git add -A<CR>
+nnoremap <leader>gc :Git commit<CR>
+nnoremap <leader>gp :Git push<CR>
+nnoremap <leader>gP :Git pull<CR>
+nnoremap <leader>gl :Git log<CR>

@@ -1,0 +1,267 @@
+snippet shebang "Shebang + modo seguro" b
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+$0
+endsnippet
+
+snippet script "Esqueleto completo de script" b
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+
+log() { printf '[%s] %s\n' "\$(date '+%Y-%m-%d %H:%M:%S')" "\$*"; }
+err() { log "ERRO: \$*" >&2; }
+
+main() {
+	$0
+}
+
+main "\$@"
+endsnippet
+
+snippet func "Função" b
+${1:nome_funcao}() {
+	$0
+}
+endsnippet
+
+snippet if "if" b
+if [[ ${1:condicao} ]]; then
+	$0
+fi
+endsnippet
+
+snippet ife "if / else" b
+if [[ ${1:condicao} ]]; then
+	$2
+else
+	$0
+fi
+endsnippet
+
+snippet ifelif "if / elif / else" b
+if [[ ${1:condicao1} ]]; then
+	$2
+elif [[ ${3:condicao2} ]]; then
+	$4
+else
+	$0
+fi
+endsnippet
+
+snippet for "for-in" b
+for ${1:item} in ${2:lista}; do
+	$0
+done
+endsnippet
+
+snippet forc "for estilo C" b
+for (( ${1:i}=0; $1 < ${2:10}; $1++ )); do
+	$0
+done
+endsnippet
+
+snippet while "while" b
+while [[ ${1:condicao} ]]; do
+	$0
+done
+endsnippet
+
+snippet until "until" b
+until [[ ${1:condicao} ]]; do
+	$0
+done
+endsnippet
+
+snippet case "case" b
+case "${1:\$var}" in
+	${2:padrao})
+		$0
+		;;
+	*)
+		;;
+esac
+endsnippet
+
+snippet getopts "parse de argumentos (getopts)" b
+while getopts ":${1:hv}" opt; do
+	case "\$opt" in
+		$0
+		\?) echo "Opcao invalida: -\$OPTARG" >&2; exit 1 ;;
+	esac
+done
+shift $(( OPTIND - 1 ))
+endsnippet
+
+snippet args "validar quantidade de argumentos" b
+if [[ \$# -lt ${1:1} ]]; then
+	echo "Uso: \$0 ${2:<argumento>}" >&2
+	exit 1
+fi
+$0
+endsnippet
+
+snippet trap "trap de limpeza" b
+cleanup() {
+	$1
+}
+trap cleanup EXIT
+$0
+endsnippet
+
+snippet log "função de log com timestamp" b
+log() { printf '[%s] %s\n' "\$(date '+%Y-%m-%d %H:%M:%S')" "\$*"; }
+$0
+endsnippet
+
+snippet arr "declarar array" b
+${1:arr}=(${2:valor1 valor2})
+$0
+endsnippet
+
+snippet arrfor "iterar array" b
+for ${1:item} in "\${${2:arr}[@]}"; do
+	$0
+done
+endsnippet
+
+snippet readf "ler arquivo linha a linha" b
+while IFS= read -r ${1:linha}; do
+	$0
+done < "${2:arquivo}"
+endsnippet
+
+snippet heredoc "here-doc" b
+cat <<${1:EOF}
+$0
+$1
+endsnippet
+
+snippet hascmd "checar se comando existe" b
+if command -v ${1:comando} >/dev/null 2>&1; then
+	$0
+fi
+endsnippet
+
+snippet colors "variáveis de cores ANSI" b
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+$0
+endsnippet
+
+snippet echoc "echo -e colorido (código ANSI direto)" b
+echo -e "\033[0;${1:32}m${2:mensagem}\033[0m"
+endsnippet
+
+snippet clog "funções de log coloridas (info/aviso/erro/sucesso)" b
+info()    { echo -e "\033[0;34m[INFO]\033[0m \$*"; }
+warn()    { echo -e "\033[0;33m[AVISO]\033[0m \$*" >&2; }
+error()   { echo -e "\033[0;31m[ERRO]\033[0m \$*" >&2; }
+success() { echo -e "\033[0;32m[OK]\033[0m \$*"; }
+$0
+endsnippet
+
+snippet ts "timestamp atual (variável)" b
+TIMESTAMP="\$(date '+%Y-%m-%d %H:%M:%S')"
+$0
+endsnippet
+
+snippet tsfile "timestamp para nome de arquivo" b
+TIMESTAMP="\$(date '+%Y%m%d_%H%M%S')"
+$0
+endsnippet
+
+snippet jq "extrair campo de um JSON com jq" b
+${1:valor}="\$(echo "${2:\$json}" | jq -r '.${3:campo}')"
+$0
+endsnippet
+
+snippet curljson "requisição curl e extração de campo com jq" b
+response="\$(curl -sS -X ${1:GET} "${2:https://api.exemplo.com}")"
+${3:valor}="\$(echo "\$response" | jq -r '.${4:campo}')"
+$0
+endsnippet
+
+snippet confirm "confirmação sim/não antes de continuar" b
+read -r -p "${1:Deseja continuar?} [s/N] " resposta
+case "\$resposta" in
+	[sS]|[sS][iI][mM]) $0 ;;
+	*) echo "Cancelado."; exit 1 ;;
+esac
+endsnippet
+
+snippet retry "repetir comando até funcionar (com limite de tentativas)" b
+tentativas=0
+max_tentativas=${1:5}
+until ${2:comando}; do
+	tentativas=\$((tentativas + 1))
+	if [[ \$tentativas -ge \$max_tentativas ]]; then
+		echo "Falhou apos \$max_tentativas tentativas." >&2
+		exit 1
+	fi
+	echo "Tentativa \$tentativas/\$max_tentativas falhou, tentando novamente..."
+	sleep ${3:2}
+done
+$0
+endsnippet
+
+snippet mktmp "arquivo temporário com limpeza automática" b
+TMPFILE="\$(mktemp)"
+trap 'rm -f "\$TMPFILE"' EXIT
+$0
+endsnippet
+
+snippet mktmpd "diretório temporário com limpeza automática" b
+TMPDIR="\$(mktemp -d)"
+trap 'rm -rf "\$TMPDIR"' EXIT
+$0
+endsnippet
+
+snippet isroot "checar se está rodando como root" b
+if [[ \$EUID -ne 0 ]]; then
+	echo "Este script precisa ser executado como root (use sudo)." >&2
+	exit 1
+fi
+$0
+endsnippet
+
+snippet envdef "variável com valor padrão" b
+${1:VAR}="\${$1:-${2:valor_padrao}}"
+$0
+endsnippet
+
+snippet spinner "spinner enquanto um processo roda em segundo plano" b
+${1:comando} &
+pid=\$!
+spin='-\\|/'
+i=0
+while kill -0 \$pid 2>/dev/null; do
+	i=\$(( (i + 1) % 4 ))
+	printf '\r%s' "\${spin:\$i:1}"
+	sleep 0.1
+done
+printf '\r'
+wait \$pid
+$0
+endsnippet
+
+snippet lock "impedir execução simultânea (lockfile)" b
+LOCKFILE="/tmp/\$(basename "\$0").lock"
+if [[ -e "\$LOCKFILE" ]]; then
+	echo "Já existe uma instância em execução (\$LOCKFILE)." >&2
+	exit 1
+fi
+trap 'rm -f "\$LOCKFILE"' EXIT
+touch "\$LOCKFILE"
+$0
+endsnippet

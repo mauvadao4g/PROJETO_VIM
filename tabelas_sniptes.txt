@@ -1,0 +1,156 @@
+======================================================================
+ VIM - TABELA DE ATALHOS E SNIPPETS  (PROJETO_VIM)
+ Gerado a partir de files/vimrc, files/ftplugin/sh.vim e
+ files/UltiSnips/sh.snippets
+======================================================================
+
+----------------------------------------------------------------------
+1. TEMAS
+----------------------------------------------------------------------
+F5              Tema anterior da lista
+F6              Proximo tema da lista
+
+Temas disponiveis (nesta ordem): dracula, gruvbox, nord, onedark,
+molokai, palenight, everforest
+(dracula e o padrao ao abrir o vim)
+
+----------------------------------------------------------------------
+2. ATALHOS GERAIS
+----------------------------------------------------------------------
+Ctrl-n          Abrir/fechar o NERDTree (arvore de arquivos)
+Ctrl-p          Buscar/abrir arquivos (fzf)
+<espaco> f      Buscar texto no projeto (Rg / ripgrep)
+<espaco> b      Listar buffers abertos
+<espaco> w      Salvar arquivo atual
+<espaco> q      Fechar arquivo atual
+<espaco> c      Comentar/descomentar linha ou selecao
+gcc             Comentar/descomentar a linha atual (vim-commentary)
+gc + movimento  Comentar/descomentar um trecho
+Tab             Expandir snippet (UltiSnips)
+Ctrl-j          Pular para o proximo campo do snippet
+Ctrl-k          Voltar ao campo anterior do snippet
+
+----------------------------------------------------------------------
+3. ATALHOS ESPECIFICOS PARA ARQUIVOS .sh
+----------------------------------------------------------------------
+<espaco> r      Salvar e executar o script atual (bash %)
+<espaco> x      Tornar o script executavel (chmod +x %)
+
+----------------------------------------------------------------------
+4. LINT E FORMATACAO DE BASH
+----------------------------------------------------------------------
+ALE + shellcheck   Analisa o script continuamente (sinais/avisos)
+shfmt              Formata o arquivo automaticamente ao salvar
+                   (indentacao 2 espacos, case indentado)
+
+----------------------------------------------------------------------
+5. GITHUB COPILOT
+----------------------------------------------------------------------
+:Copilot setup       Autenticar (rodar uma vez por maquina, via navegador)
+Ctrl-l (insert)      Aceitar a sugestao do Copilot
+Alt-]                Proxima sugestao
+Alt-[                Sugestao anterior
+:Copilot enable      Ativar sugestoes
+:Copilot disable     Desativar sugestoes
+:Copilot status      Ver status da autenticacao/conexao
+
+Obs: Tab continua reservado para o UltiSnips; por isso o Copilot foi
+remapeado para Ctrl-l (evita o conflito classico entre os dois plugins).
+Requer Node.js >= 18.
+
+----------------------------------------------------------------------
+6. CLAUDE (Claude Code CLI)
+----------------------------------------------------------------------
+<espaco> a c    Abrir o Claude interativo (claude) em um split
+<espaco> a e    Explicar o arquivo atual (normal) ou a selecao (visual)
+<espaco> a r    Revisar/apontar bugs do arquivo atual ou da selecao
+<espaco> a f    Corrigir bugs do arquivo atual
+<espaco> a a    Digitar um prompt livre (abre :ClaudeAsk na linha de comando)
+
+Tambem funciona direto: :ClaudeAsk <pergunta>            (arquivo inteiro)
+                         :'<,'>ClaudeAsk <pergunta>       (so a selecao, em modo visual)
+
+O resultado aparece em um split de terminal embaixo; feche com :q ou Ctrl-w c.
+Requer o comando "claude" instalado e autenticado no PATH.
+
+----------------------------------------------------------------------
+7. GIT (GitHub, via vim-fugitive)
+----------------------------------------------------------------------
+<espaco> g i    Inicializar repositorio (git init)
+<espaco> g s    Status (git status, painel interativo)
+<espaco> g a    Adicionar o arquivo atual (git add %)
+<espaco> g A    Adicionar tudo (git add -A)
+<espaco> g c    Commit (git commit, abre editor de mensagem)
+<espaco> g p    Push (git push)
+<espaco> g P    Pull (git pull)
+<espaco> g l    Log (git log)
+
+No painel de status (<espaco> g s): s = stage, u = unstage, cc = commit,
+g? = ajuda completa do fugitive.
+
+----------------------------------------------------------------------
+8. SNIPPETS DE BASH  (digite o gatilho + Tab)
+----------------------------------------------------------------------
+
+-- Estrutura / controle de fluxo --
+shebang      Shebang + set -euo pipefail + IFS
+script       Esqueleto completo de script (shebang, log, main, etc.)
+func         Definicao de funcao
+if           Bloco if
+ife          Bloco if / else
+ifelif       Bloco if / elif / else
+for          Laco for item in lista
+forc         Laco for estilo C
+while        Laco while
+until        Laco until
+case         Bloco case
+
+-- Argumentos e execucao --
+getopts      Parser de argumentos com getopts
+args         Validar quantidade de argumentos recebidos
+isroot       Verificar se esta rodando como root ($EUID)
+confirm      Confirmacao sim/nao antes de continuar (read -p)
+
+-- Limpeza / robustez --
+trap         trap de limpeza no EXIT
+mktmp        Arquivo temporario com limpeza automatica (mktemp + trap)
+mktmpd       Diretorio temporario com limpeza automatica
+lock         Lockfile para impedir execucao simultanea do script
+retry        Repetir um comando ate funcionar (limite de tentativas)
+
+-- Variaveis e dados --
+envdef       Variavel com valor padrao (${VAR:-padrao})
+arr          Declarar array
+arrfor       Iterar sobre um array
+readf        Ler arquivo linha a linha
+heredoc      Bloco here-doc (cat <<EOF ... EOF)
+hascmd       Checar se um comando existe (command -v)
+
+-- Cores e log --
+colors       Variaveis de cores ANSI (RED, GREEN, YELLOW, etc.)
+echoc        echo -e com codigo de cor ANSI inline
+clog         Funcoes de log coloridas: info, warn, error, success
+log          Funcao de log simples com timestamp
+
+-- Tempo --
+ts           Timestamp atual em variavel (YYYY-MM-DD HH:MM:SS)
+tsfile       Timestamp para nome de arquivo (YYYYMMDD_HHMMSS)
+
+-- JSON / rede --
+jq           Extrair um campo de um JSON com jq
+curljson     Requisicao curl + extracao de campo com jq
+
+-- Progresso --
+spinner      Spinner enquanto um processo roda em segundo plano
+
+Observacao: jq e curljson precisam do utilitario "jq" instalado
+(ja incluso no vim_install.sh).
+
+Alem destes, todos os snippets padrao de honza/vim-snippets tambem
+estao disponiveis (outras linguagens, alem de bash).
+
+----------------------------------------------------------------------
+Para reinstalar/atualizar esta configuracao: ./vim_install.sh
+Para criar novos snippets rapidamente: ./gerar_snippets.sh
+Fonte dos arquivos: /root/PROJETO_VIM/files/
+======================================================================
