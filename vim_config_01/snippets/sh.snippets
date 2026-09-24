@@ -1,0 +1,2324 @@
+# VER: 1.0.1
+priority -50
+
+global !p
+import vim
+
+# local: ~/.vim/pack/vendor/start/vim-snippets/UltiSnips/sh.snippets
+# Tests for the existence of a variable declared by Vim's filetype detection
+# suggesting the type of shell script of the current file
+def testShell(scope, shell):
+	return vim.eval("exists('" + scope + ":is_" + shell + "')")
+
+# Loops over the possible variables, checking for global variables
+# first since they indicate an override by the user.
+def getShell():
+	for scope in ["g", "b"]:
+		for shell in ["bash", "posix", "sh", "kornshell"]:
+			if testShell(scope, shell) == "1":
+				if shell == "kornshell":
+					return "ksh"
+				if shell == "posix":
+					return "sh"
+				return shell
+	return "sh"
+endglobal
+
+###########################################################################
+#                            TextMate Snippets                            #
+###########################################################################
+
+snippet snippet "Snippet que gera outro snippet" b
+snippet ${1:trigger} "${2:description}" b
+ ${3:conteudo_do_snippet}
+`!p snip.rv = "endsnippet"`
+endsnippet
+
+snippet snip "Create Snippet"
+snippet ${1:nome} "${2:COMENTARIO}"
+${3:COMANDOS_SNIPPETS}
+endsnipet
+
+endsnippet
+
+# Jogando a saida pro dev/null
+snippet > " >/dev/null 2>&1" b
+ >/dev/null 2>&1
+endsnippet
+
+snippet dev " >/dev/null 2>&1" b
+${1:COMANDOS} >/dev/null 2>&1
+endsnippet
+
+snippet /dev ">dev/null 2>&1"
+>/dev/null 2>&1
+endsnippet
+
+
+snippet 2> ">dev/null 2>&1"
+>/dev/null 2>&1
+endsnippet
+
+
+snippet /dev/null ">dev/null 2>&1"
+>/dev/null 2>&1
+endsnippet
+
+
+snippet null ">dev/null"
+>/dev/null
+endsnippet
+
+# Verificar conexao com o git
+snippet testgit "Verifica conexao com o ssh do github"
+function verificar_ssh_github() {
+    echo "Verificando conexão SSH com o GitHub..."
+    if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+        echo -e "\033[32mConexão SSH com o GitHub está funcionando corretamente!\033[0m"
+    else
+        echo -e "\033[31mFalha na conexão SSH com o GitHub. Verifique sua chave SSH e tente novamente.\033[0m"
+    fi
+}
+
+endsnippet
+
+
+
+snippet vim "Comando pra instalar o vim."
+# comando pra instalar o vim configurado
+bash <(curl -sL "https://raw.githubusercontent.com/mauvadao4g/maudovim/refs/heads/main/instalador")
+endsnippet
+
+snippet timea "20241202_173015 - data para backup" b
+# Backup de arquivos.
+            timestamp=$(date +%Y%m%d_%H%M%S)
+
+endsnippet
+
+snippet bkpa "20241202_173015 - data para backup" b
+# Backup de arquivos.
+            timestamp=$(date +%Y%m%d_%H%M%S)
+    mkdir -p ~/backup_${1:file}_$timestamp
+endsnippet
+
+snippet timestamp "20241202_173015 - Data para backup" b
+        timestamp=$(date +%Y%m%d_%H%M%S)
+endsnippet
+
+snippet ext "Mostra somente a extencao do arquivo"
+${1:arquivo}="file.txt"
+extensao="\${${1:arquivo}##*.\}"  # Apenas a extensão
+
+endsnippet
+
+snippet nome "Mostra somente o nome do arquivo"
+nome="file.txt"
+${1:arquivo}="$\{${1:nome}%.*\}"    # Nome sem extensão
+
+endsnippet
+
+
+
+snippet # "Adiciona um comentario"
+# ${1:COMENTARIO}
+
+endsnippet
+
+snippet #! "#!/usr/bin/env (!env)" b
+`!p snip.rv = '#!/usr/bin/env ' + getShell() + "\n" `
+endsnippet
+
+snippet bin "#!/bin/bash"
+#!/bin/bash
+
+endsnippet
+
+snippet sh "Cabecalho shell script"
+#!/bin/bash
+# MAUVADAO
+# VER: 1.0.0
+
+endsnippet
+
+snippet shell "Cabecalho shell script"
+#!/bin/bash
+# MAUVADAO
+# VER: 1.0.0
+
+endsnippet
+
+
+snippet bash "Cabecalho shell script"
+#!/bin/bash
+# MAUVADAO
+# VER: 1.0.0
+
+endsnippet
+
+snippet sbash "safe bash options" b
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+`!p snip.rv ='\n\n' `
+endsnippet
+
+snippet temp "Tempfile" b
+${1:TMPFILE}="$(mktemp -t ${3:--suffix=${4:.SUFFIX}} ${2:`!p
+snip.rv = re.sub(r'[^a-zA-Z]', '_', snip.fn) or "untitled"
+`}.XXXXXX)"
+${5:${6/(.+)/trap "/}${6:rm -f '$${1/.*\s//}'}${6/(.+)/" 0               # EXIT\n/}${7/(.+)/trap "/}${7:rm -f '$${1/.*\s//}'; exit 1}${7/(.+)/" 2       # INT\n/}${8/(.+)/trap "/}${8:rm -f '$${1/.*\s//}'; exit 1}${8/(.+)/" 1 15    # HUP TERM\n/}}
+
+endsnippet
+
+snippet /case|sw(itch)?/ "case .. esac (case)" rb
+case ${1:word} in
+	${2:pattern} )
+		${0:${VISUAL}};;
+esac
+endsnippet
+
+snippet elif "elif .. (elif)" b
+elif ${2:[[ ${1:condition} ]]}; then
+	${0:${VISUAL}}
+endsnippet
+
+snippet for "for ... done (for)" b
+for (( i = 0; i < ${1:10}; i++ )); do
+	${0:${VISUAL}}
+done
+endsnippet
+
+snippet forin "for ... in ... done (forin)" b
+for ${1:i}${2/.+/ in /}${2:words}; do
+	${0:${VISUAL}}
+done
+endsnippet
+
+snippet here "here document (here)"
+<<-${2:'${1:TOKEN}'}
+	$0`echo \\n`${1/['"`](.+)['"`]/$1/}
+endsnippet
+
+snippet /ift(est)?/ "if ... then (if)" rb
+if ${2:[ ${1:condition} ]}; then
+	${0:${VISUAL}}
+fi
+endsnippet
+
+snippet if "if ... then (if)" b
+if [[ ${1:condition} ]]; then
+	${0:${VISUAL}}
+fi
+endsnippet
+
+snippet until "until ... (done)" b
+until ${2:[[ ${1:condition} ]]}; do
+	${0:${VISUAL}}
+done
+endsnippet
+
+snippet /wh(ile)?/ "while ... (done)" rb
+while ${2:[[ ${1:condition} ]]}; do
+	${0:${VISUAL}}
+done
+endsnippet
+
+snippet func "function() {...}" b
+${1:function} () {
+	${0:${VISUAL}}
+}
+endsnippet
+
+snippet iff "if inline"
+# Verificando condicao
+[[ ${1:condition} ]] && {
+	${2:VISUAL}
+}
+endsnippet
+
+snippet filee "Verifica se o file existe"
+# verificando se o file existe
+file="${1:FILE}"
+[[ -f "$file" ]] && { echo 'File encontrado'; }
+endsnippet
+
+snippet filen "Se o file nao existe"
+# Se o file nao existir faça o comando.
+file="${1:FILE}"
+[[ ! -f "$file" ]] && { echo'File não existe'; }
+endsnippet
+
+snippet status "Verifica o status da conexao"
+# verificando o status da conexao
+# setando informações de proxy e servidor
+dom="${1:seu_dominio}"
+tempo="${2:1}"
+proxy="${3:timofertas.com}"
+porta="${4:80}"
+request="${5:PATCH}"
+# fazendo o request
+curl -m "$tempo" -s -o /dev/null -w '%{http_code}' -X GET "$dom" -H 'Websocket: Upgrade' -x "$proxy:$porta"
+endsnippet
+
+
+snippet ife "Verifica se o file existe"
+# se for verdadeiro
+[[ ${1:CONDICAO} ]] && { ${2:COMANDOS}; }
+endsnippet
+
+snippet ifn "Se o file nao existe"
+# se nao for verdadeiro.
+[[ ${1:CONDICAO} ]] && { ${2:COMANDOS}; }
+endsnippet
+
+snippet usada "Verificar se parâmetro está em uso" b
+[[ -n "\$1" ]] && {
+${1:Code}
+  }
+endsnippet
+
+snippet check "Curl Status" b
+# checa o status do host
+curl -m ${1:0.60} -o /dev/null -w '%{http_code}' -X ${2:$request} "${3:\$dom}" -H "Websocket: Upgrade" -x "${4:$proxy}:${4:$porta}"
+endsnippet
+
+
+snippet tutorial "Função tutorial com verificação" b
+# tutorial
+TUTORIAL(){
+   cat <<'TUTO' 
+${1:TEXTO_TUTORIAL}
+
+TUTO
+
+}
+# verifica se foi chamada a função tutorial
+if [[ "\$1" == *'code'* || "\$1" == *'h'* ]]; then
+    TUTORIAL
+    exit 0
+fi
+endsnippet
+
+snippet chk "Curl Status"
+# Checar o status do host
+curl -m1 -o /dev/null -w '%{http_code}' -X ${1:$request} "${2:\$dom}" -H "Websocket: Upgrade" -x "${3:$proxy}:${4:$port}"
+endsnippet
+
+# checando se a aplicação ja está instalada
+snippet install "Check Command Exists" b
+if ! command -v ${1:command} &>/dev/null; then
+    echo "${1:command} could not be found"
+    exit 1
+fi
+endsnippet
+
+# cria uma pasta temporaria
+snippet tmpfile "Temporary File" b
+TMPFILE=$(mktemp)
+${1:## code}
+rm -f "$TMPFILE"
+endsnippet
+
+# lendo linhas de files.txt
+snippet readfile "Read File Line by Line" b
+while IFS= read -r line; do
+    echo "\$line"
+	${1:COMANDOS}
+done < "${2:filename}"
+endsnippet
+
+# conectando ao ssh
+snippet ssh "SSH Command" b
+ssh ${1:root}@${2:host} -p ${3:22}
+endsnippet
+
+# conectando ao servidor sem nescecidade de colocar senhas.
+
+snippet conect "Conectar ao servidor"
+sshpass -p${1:PASSWORD} ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 ${2:root}@${3:IP_SERVIDOR} -p ${4:22}
+endsnippet
+
+snippet sshpass "SSH usando senha"
+servidor="${1:servidor}"
+user="${2:root}"
+pass="${3:pass}"
+porta="${4:22}"
+sshpass -p "$pass" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=2 "$user@$servidor" -p $porta
+endsnippet
+
+
+
+# colorindo mensagens
+snippet paleta "Cria uma funçao contendo todas as cores"
+# FUNÇÃO PRA COLORIR AS MENSAGEM DO ECHO
+msg_cor(){
+case "\$1" in
+vm|vermelho)
+echo -e "\e[1;31m\$2\e[m"
+;;
+vd|verde)
+echo -e "\e[1;32m\$2\e[m"
+;;
+bd|bordo)
+echo -e "\e[1;35m\$2\e[m"
+;;
+am|amarelo)
+echo -e "\e[1;33m\$2\e[m"
+;;
+cy|cyano)
+echo -e "\e[1;36m\$2\e[m"
+;;
+az|azul)
+echo -e "\e[1;34m\$2\e[m"
+;;
+*)
+echo -e "\e[1;37m\$2\e[m"
+esac
+}
+# pra chamar a função exibindo as cores
+# msg_cor 'cyano' "$saudacao. Agora são $hora:$minuto"
+endsnippet
+
+
+
+# Adicionando função de horario
+snippet horas "Obten o horario atual com saudação."
+_horas(){
+# Obtém a hora atual no fuso horário de São Paulo
+hora=$(TZ=America/Sao_Paulo date +%H)
+minuto=$(TZ=America/Sao_Paulo date +%M)
+
+# Define as saudações com base no horário
+if [ "$hora" -ge 0 -a "$hora" -lt 12 ]; then
+    saudacao="Bom Dia"
+elif [ "$hora" -ge 12 -a "$hora" -lt 18 ]; then
+    saudacao="Boa Tarde"
+else
+    saudacao="Boa Noite"
+fi
+}
+endsnippet
+
+# PEGANDO INFORMAÇÕES DO VIDEO URL
+snippet ytinf "Pegando informações do url do video"
+# Pegando informações do video
+# Gerar variáveis a partir do JSON recebido
+
+videoInfo() {
+        video_url="${1:$1}"
+        response=$(yt-dlp --cookies "$cookies" \
+        --user-agent "$agente" \
+        -f 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/bestvideo[ext=mp4]' \
+        "$video_url" --print-json --no-warning  --skip-download 2>/dev/null)
+
+    nomeVideo="$(echo "$response" | jq -r '.title')"
+    urlVideo="$(echo "$response" | jq -r '.webpage_url')"
+    duracaoVideo="$(echo "$response" | jq -r '.duration')"
+    duracao="$(echo "$response" | jq -r '.duration_string')"
+    dataVideo="$(echo "$response" | jq -r '.upload_date')"
+    viewsVideo="$(echo "$response" | jq -r '.view_count')"
+    idCanal="$(echo "$response" | jq -r '.uploader_id')"
+    canalVideo="$(echo "$response" | jq -r '.uploader_url')"
+    resolucao="$(echo "$response" | jq -r '.resolution')"
+    postado="$dataVideo"
+  #  _passado="$(calcular_tempo_passado "$postado")"
+
+
+ # Exibir os dados
+ cat <<EOF
+Nome: $nomeVideo
+Url: $urlVideo
+Duração: $duracao
+Postado: $_passado
+Views: $viewsVideo
+Resolução: $resolucao
+Canal: $idCanal
+UrlCanal: $canalVideo
+EOF
+}
+
+endsnippet
+
+
+snippet ytdlp "Baixa videos do youtube"
+    # comando pra baixar videos do youtube
+    url=${1:\$1}
+    yt-dlp --cookies /bin/cookies.txt --user-agent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' -f 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/bestvideo[ext=mp4]/mp4' "$url" -o '%(title)s-%(id)s.%(ext)s'
+endsnippet
+
+
+# BAIXAR VIDEO DA URL
+snippet ytdown "Download de video url"
+ytdown(){
+	# baixando videos da url.
+cookies="${1:cookies.txt}"
+video_url="${2:\$1}"
+yt-dlp --cookies "$cookies" \
+        --user-agent "$agente" \
+        -f 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/bestvideo[ext=mp4]' \
+        "$video_url" 2>/dev/null
+
+}
+
+endsnippet
+
+
+
+# PRINTAR  MENSAGENS
+# echo -e "\e[1;34m• \e[0m"
+snippet echo* "•Printa a mensagem na tela"
+echo -e "\e[1;${1:37}m• ${2:$MENSAGEM}\e[0m"
+endsnippet
+
+
+snippet echo "Printa a mensagem na tela"
+echo -e "\e[1;${1:37}m${2:$MENSAGEM}\e[0m"
+endsnippet
+
+
+
+snippet echsz "Printa a mensagem na tela na cor sinza"
+echo -e "\e[1;${1:30}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echvm "Printa a mensagem na cor vermelho"
+echo -e "\e[1;${1:31}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echvd "Printa a mensagem na cor verde"
+echo -e "\e[1;${1:32}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echam "Printa a mensagem na cor amarelo"
+echo -e "\e[1;${1:33}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echaz "Printa a mensagem na cor azul"
+echo -e "\e[1;${1:34}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echbd "Printa a mensagem na cor bordo"
+echo -e "\e[1;${1:35}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echcy "Printa a mensagem na cor cyano"
+echo -e "\e[1;${1:36}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+snippet echbr "Printa a mensagem na cor branco"
+echo -e "\e[1;${1:37}m${2$MENSAGEM}\e[0m"
+endsnippet
+
+
+
+snippet bkp "Gera o nome do file de backup"
+# Gerando um file de backup
+file="$( echo ${1:file-}$(date '+%d%m%y_%H%M%S').bkp)"
+${2:COMANDOS PRA EXEXUTAR}
+[[ -f "$file" ]] && { echo "File criado com sucesso: $file"; }
+endsnippet
+
+
+####################################################
+#             TELEGRAM MENSAGENS
+####################################################
+
+####################################################
+#   VISUALIZAÇÕES DE MENSAGENS
+####################################################
+# Snippet para obter as atualizações pendentes
+snippet getupdates "Obtém atualizações pendentes"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates"
+endsnippet
+
+# Snippet para obter atualizações com offset (evitar duplicidade)
+snippet getupdatesoffset "Obtém atualizações usando offset"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" \
+-d offset="${2:OFFSET}" \
+-d limit="${3:100}" \
+-d timeout="${4:0}"
+endsnippet
+
+# Snippet para extrair o chat_id de uma atualização
+snippet getchatid "Extrai o chat_id de uma atualização"
+echo "$(curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | jq '.result[0].message.chat.id')"
+endsnippet
+
+# Snippet para extrair o texto da mensagem de uma atualização
+snippet getmsg "Extrai o texto da mensagem"
+echo "$(curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | jq -r '.result[0].message.text')"
+endsnippet
+
+# Snippet para processar mensagens com loop
+snippet processupdates "Processa mensagens recebidas com loop"
+while true; do
+  updates=$(curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" -d offset="${2:OFFSET}" -d timeout=10)
+  echo "$updates" | jq -c '.result[]' | while read -r message; do
+    chat_id=$(echo "$message" | jq -r '.message.chat.id')
+    user_message=$(echo "$message" | jq -r '.message.text')
+    # Aqui você pode adicionar o código para responder ou processar a mensagem
+    echo "Mensagem recebida de $chat_id: $user_message"
+    # Atualiza o offset para evitar processar a mesma mensagem novamente
+    OFFSET=$(echo "$message" | jq '.update_id') && OFFSET=$((OFFSET+1))
+  done
+done
+endsnippet
+
+# Snippet para capturar mensagens enviadas em grupos
+snippet groupmsgs "Filtra mensagens enviadas em grupos"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | \
+jq -r '.result[] | select(.message.chat.type == "group") | .message'
+endsnippet
+
+# Snippet para capturar mensagens de usuários específicos
+snippet usermsgs "Filtra mensagens de um usuário específico"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | \
+jq -r '.result[] | select(.message.from.id == ${2:USER_ID}) | .message.text'
+endsnippet
+
+# Snippet para capturar mensagens com entidades (ex.: comandos ou links)
+snippet commandmsgs "Filtra mensagens com entidades"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | \
+jq -r '.result[] | select(.message.entities != null) | .message'
+endsnippet
+
+# Snippet para capturar informações do usuário que enviou uma mensagem
+snippet getuserinfo "Extrai informações do usuário"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | \
+jq -r '.result[0].message.from | {id, is_bot, first_name, username}'
+endsnippet
+
+# Snippet para obter mensagens com fotos anexadas
+snippet photomsgs "Filtra mensagens com fotos"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | \
+jq -r '.result[] | select(.message.photo != null) | .message'
+endsnippet
+
+# Snippet para obter mensagens com localização
+snippet locmsgs "Filtra mensagens com localização"
+curl -s "https://api.telegram.org/bot${1:$TOKEN}/getUpdates" | \
+jq -r '.result[] | select(.message.location != null) | .message.location'
+endsnippet
+####################################################
+#         ENVIO DE MENSAGEMS
+####################################################
+
+
+snippet testt "apenas um teste"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendMessage" -d chat_id="${2:$CHAT_ID}" -d text="${3:$MENSAGEM}" -d parse_mode="${4:HTML}"
+endsnippet
+
+# Snippet para enviar uma mensagem de texto simples
+snippet sendmsg "Envia uma mensagem de texto"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendMessage" -d chat_id="${2:$CHAT_ID}" -d text="${3:$MENSAGEM}" -d parse_mode="${4:HTML}"
+endsnippet
+
+# Snippet para enviar uma foto
+snippet sendphoto "Envia uma foto com descrição"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendPhoto" -F chat_id="${2:$CHAT_ID}" -F photo="@${3:CAMINHO/DA/FOTO}" -F caption="${4:$DESCRICAO}" -F parse_mode="${5:HTML}"
+endsnippet
+
+# Snippet para enviar um documento
+snippet senddoc "Envia um documento com descrição"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendDocument" -F chat_id="${2:$CHAT_ID}" -F document="@${3:CAMINHO/DO/ARQUIVO}" -F caption="${4:$DESCRICAO}" -F parse_mode="${5:HTML}"
+endsnippet
+
+# Snippet para enviar uma mensagem com teclado inline
+snippet sendinline "Envia uma mensagem com botões inline"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendMessage" \
+-d chat_id="${2:$CHAT_ID}" \
+-d text="${3:$MENSAGEM}" \
+-d parse_mode="${4:HTML}" \
+-d reply_markup='{"inline_keyboard": [[{"text": "${5:NOME_DO_BOTÃO}", "url": "${6:URL_DO_BOTÃO}"}]]}'
+endsnippet
+
+# Snippet para enviar mensagem com teclado customizado
+snippet sendkeyb "Envia mensagem com teclado customizado"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendMessage" \
+-d chat_id="${2:$CHAT_ID}" \
+-d text="${3:$MENSAGEM}" \
+-d parse_mode="${4:HTML}" \
+-d reply_markup='{"keyboard": [["${5:BOTÃO1}"], ["${6:BOTÃO2}"]], "resize_keyboard": true, "one_time_keyboard": true}'
+endsnippet
+
+# Snippet para editar mensagem de texto
+snippet editmsg "Edita uma mensagem de texto enviada anteriormente"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/editMessageText" \
+-d chat_id="${2:$CHAT_ID}" \
+-d message_id="${3:$MESSAGE_ID}" \
+-d text="${4:NOVA_MENSAGEM}" \
+-d parse_mode="${5:HTML}"
+endsnippet
+
+# Snippet para deletar mensagem
+snippet delmsg "Deleta uma mensagem enviada"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/deleteMessage" \
+-d chat_id="${2:$CHAT_ID}" \
+-d message_id="${3:$MESSAGE_ID}"
+endsnippet
+
+####################################################
+#  FUNÇÕES TELEGRAM PARTE 2 (ADICIONAIS)
+####################################################
+# Snippet para enviar uma mensagem de localização
+snippet sendloc "Envia uma localização"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendLocation" \
+-d chat_id="${2:$CHAT_ID}" \
+-d latitude="${3:LATITUDE}" \
+-d longitude="${4:LONGITUDE}" \
+-d horizontal_accuracy="${5:HORIZONTAL_ACCURACY}"
+endsnippet
+
+# Snippet para enviar um áudio
+snippet sendaudio "Envia um arquivo de áudio com legenda"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendAudio" \
+-F chat_id="${2:$CHAT_ID}" \
+-F audio="@${3:CAMINHO/DO/AUDIO}" \
+-F caption="${4:$DESCRICAO}" \
+-F parse_mode="${5:HTML}" \
+-F performer="${6:ARTISTA}" \
+-F title="${7:TÍTULO}"
+endsnippet
+
+# Snippet para enviar um vídeo
+snippet sendvideo "Envia um vídeo com legenda"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendVideo" \
+-F chat_id="${2:$CHAT_ID}" \
+-F video="@${3:CAMINHO/DO/VIDEO}" \
+-F caption="${4:$DESCRICAO}" \
+-F parse_mode="${5:HTML}" \
+-F supports_streaming="${6:true}"
+endsnippet
+
+# Snippet para enviar uma mensagem de contato
+snippet sendcontact "Envia um contato"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendContact" \
+-d chat_id="${2:$CHAT_ID}" \
+-d phone_number="${3:NUMERO_DO_TELEFONE}" \
+-d first_name="${4:PRIMEIRO_NOME}" \
+-d last_name="${5:ULTIMO_NOME}"
+endsnippet
+
+# Snippet para enviar uma enquete
+snippet sendpoll "Envia uma enquete para o usuário"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendPoll" \
+-d chat_id="${2:$CHAT_ID}" \
+-d question="${3:PERGUNTA}" \
+-d options='["${4:OPCAO1}", "${5:OPCAO2}"]' \
+-d is_anonymous="${6:true}"
+endsnippet
+
+# Snippet para encaminhar uma mensagem
+snippet forwardmsg "Encaminha uma mensagem"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/forwardMessage" \
+-d chat_id="${2:$CHAT_ID_DESTINO}" \
+-d from_chat_id="${3:$CHAT_ID_ORIGEM}" \
+-d message_id="${4:$MESSAGE_ID}"
+endsnippet
+
+# Snippet para enviar uma animação (GIF)
+snippet sendanimation "Envia uma animação (GIF)"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendAnimation" \
+-F chat_id="${2:$CHAT_ID}" \
+-F animation="@${3:CAMINHO/DO/ARQUIVO}" \
+-F caption="${4:$DESCRICAO}" \
+-F parse_mode="${5:HTML}"
+endsnippet
+
+# Snippet para enviar uma ação de digitação
+snippet sendaction "Envia uma ação de digitação ou carregamento"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/sendChatAction" \
+-d chat_id="${2:$CHAT_ID}" \
+-d action="${3:typing}" # Opções: typing, upload_photo, record_video, upload_video, record_voice, upload_voice, upload_document, find_location, record_video_note, upload_video_note
+endsnippet
+
+# Snippet para fixar uma mensagem em um chat
+snippet pinmsg "Fixa uma mensagem em um chat"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/pinChatMessage" \
+-d chat_id="${2:$CHAT_ID}" \
+-d message_id="${3:$MESSAGE_ID}" \
+-d disable_notification="${4:false}"
+endsnippet
+
+# Snippet para desfixar uma mensagem em um chat
+snippet unpinmsg "Desfixa uma mensagem em um chat"
+curl -s -X POST "https://api.telegram.org/bot${1:$TOKEN}/unpinChatMessage" \
+-d chat_id="${2:$CHAT_ID}" \
+-d message_id="${3:$MESSAGE_ID}"
+endsnippet
+####################################################
+
+
+####################################################
+#      SNIPEETS UTEIS AO DIA A DIA
+####################################################
+###########################################################
+#      SNIPEETS PEGANDO INFORMAÇÕES DE IP EXTERNO E INTERNO
+###########################################################
+
+# Ver Ip externo
+snippet verip "Ver ip externo"
+IP=$(curl -s http://whatismyip.akamai.com/)
+endsnippet
+
+snippet verip1 "checkip.amazonaws.com"
+# Verificar ip externo
+IP=$(curl  http://checkip.amazonaws.com)
+endsnippet
+
+
+snippet verip2 "checkip.amazonaws.com"
+# Verificar ip externo
+IP=$(lynx -dump http://checkip.amazonaws.com)
+endsnippet
+
+
+snippet verip3 "api.ipify.org"
+# Verificar ip externo
+IP=$(curl https://api.ipify.org)
+endsnippet
+
+# Snippet para obter o IP externo do provedor
+snippet ipex "Verifica o ip externo da máquina"
+# Utiliza um serviço público para obter o IP externo da máquina
+IP_EXTERNO="$(curl -s https://api64.ipify.org || curl -s https://api.ipify.org)
+echo -e "\e[1;32mIP:\e[0m \e[1;33m$IP_EXTERNO\e[0m"
+endsnippet
+
+# Snippet para obter o IP interno da máquina
+snippet ipin "Verifica o ip interno da máquina"
+# Exibe o IP interno atribuído à interface de rede ativa
+IP_INTERNO=$(ip addr show | awk '/inet / {print $2}' | cut -d/ -f1 | grep -v "127.0.0.1")
+echo -e "\e[1;32mIP:\e[0m \e[1;33m$IP_INTERNO\e[0m"
+endsnippet
+
+snippet ipex_dig "Verifica o IP externo usando dig"
+# Obtém o IP externo consultando servidores de DNS do Google
+dig +short myip.opendns.com @resolver1.opendns.com
+endsnippet
+
+snippet ipex_wget "Verifica o IP externo usando wget"
+# Utiliza wget para consultar o IP externo
+wget -qO- https://api64.ipify.org || wget -qO- https://api.ipify.org
+endsnippet
+
+snippet ipex_http "Verifica o IP externo usando httpie"
+# Usa o httpie para consultar o IP externo
+http https://api64.ipify.org
+endsnippet
+
+snippet ipex_nslookup "Verifica o IP externo usando nslookup"
+# Resolve o IP externo consultando o serviço opendns
+nslookup myip.opendns.com resolver1.opendns.com | awk '/Address/ {print $2}' | tail -n1
+endsnippet
+
+snippet ipin_hostname "Verifica o IP interno usando hostname"
+# Mostra todos os IPs internos associados à máquina
+hostname -I | awk '{print $1}'
+endsnippet
+
+snippet ipin_ifconfig "Verifica o IP interno usando ifconfig"
+# Obtém o IP interno utilizando o ifconfig
+ifconfig | grep "inet " | awk '{print $2}' | grep -v "127.0.0.1"
+endsnippet
+
+snippet ipin_nmcli "Verifica o IP interno usando nmcli"
+# Exibe o IP interno associado à conexão ativa do NetworkManager
+nmcli -g IP4.ADDRESS device show | grep -v "127.0.0.1"
+endsnippet
+
+snippet ipin_simple "Verifica o IP interno usando ip e grep"
+# Mostra o IP interno da interface ativa
+ip -4 -o addr show | grep -v "127.0.0.1" | awk '{print $4}' | cut -d/ -f1
+endsnippet
+
+snippet ipin_python "Verifica o IP interno usando Python"
+# Obtem o IP interno utilizando Python
+python3 -c "import socket; print(socket.gethostbyname(socket.gethostname()))"
+endsnippet
+
+
+####################################################
+#
+####################################################
+# VERIFICAR URL
+snippet check_url "Verifica se a URL é um domínio ou um IPv4 válido"
+# Função para verificar se é um IPv4 válido
+is_ipv4() {
+  local ip=\$1
+  [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] && \
+  for octet in $(echo "$ip" | tr '.' ' '); do
+    [[ $octet -ge 0 && $octet -le 255 ]] || return 1
+  done && return 0 || return 1
+}
+
+# Função para verificar se é um domínio válido
+is_domain() {
+  local domain=\$1
+  [[ $domain =~ ^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$ ]]
+}
+
+# Verificar entrada
+check_url() {
+  local input=\$1
+  if is_ipv4 "$input"; then
+    echo "É um IPv4 válido."
+  elif is_domain "$input"; then
+    echo "É um domínio válido."
+  else
+    echo "Entrada inválida."
+  fi
+}
+
+endsnippet
+
+
+####################################################
+#  BAIXANDO CONFIGURAÇÕES DO APLICATIVO C4G
+####################################################
+# busca por nome na configuração Networks.
+snippet c4g_name "Busca em JSON de uma URL por redes com nome correspondente usando --arg"
+# Busca por nome na chave .Networks fintrando pelo campo .Name
+# Define a URL e o termo de busca
+url="\$1"
+search="\$2"
+
+# Faz a requisição à URL e utiliza jq para filtrar as redes com base no termo, usando --arg para passar variáveis
+curl -sL "$url" | jq --arg search "$search" '.Networks[] | select(.Name | test($search;"i"))'
+endsnippet
+
+# busca por Payloads.
+snippet c4g_payloads "Busca em JSON de uma URL por redes com nome correspondente usando --arg"
+# busca por Payloads.
+# Define a URL e o termo de busca
+url="\$1"
+# Faz a requisição à URL e utiliza jq para filtrar as redes com base no termo, usando --arg para passar variáveis
+curl -sL "$url" | jq '.Networks[] | .Payload' | sed 's/"/\n"/'
+
+endsnippet
+
+
+# Busca por Proxy
+snippet c4g_proxy "Busca em JSON de uma URL por redes com nome correspondente usando --arg"
+# Define a URL e o termo de busca
+url="\$1"
+curl -sL "$url" | jq '.Networks[] | .ProxyIP'
+
+endsnippet
+
+
+# Busca por UrlUpdate
+snippet c4g_urlupdate "Busca em JSON de uma URL por redes com nome correspondente usando --arg"
+# Define a URL e o termo de busca
+url="\$1"
+curl -sL "$url" | jq '.UrlUpdate'
+
+endsnippet
+
+# Busca por Sni
+snippet c4g_sni "Busca em JSON de uma url por .SNI"
+# Define a URL e o termo de busca
+url="\$1"
+curl -sL "$url" | jq '.Networks[] | .SNI'
+
+endsnippet
+
+
+# Busca por .Networks
+snippet c4g_networks "Busca em JSON de uma url por .Networks"
+# Define a URL e o termo de busca
+url="\$1"
+curl -sL "$url" | jq '.Networks[]'
+
+endsnippet
+
+
+####################################################
+#    DATA E HORAS
+####################################################
+snippet data "Visualizar data"
+data=$(date '+%Y-%m-%d %H:%M:%S')
+echo "$data"
+endsnippet
+
+snippet hr "Visualizar o horario"
+horas=$(date '+%H:%M:%S')
+echo "$horas"
+endsnippet
+
+# verificar se programa existe
+snippet command "Visualizar se o programa esta instalado"
+# Verificação de dependências
+if ! command -v ${1:APLICAÇÃO} &> /dev/null; then
+    echo -e "\033[1;31mErro: $1 não está instalado.\033[0m"
+    exit 1
+fi
+endsnippet
+
+
+snippet dire "Verificar se o diretório de origem existe"
+
+# Verificar se o diretório de origem existe
+${1:SOURCE_DIR}="${2:/caminho/do/diretório}"
+if [[ ! -d "${3:$SOURCE_DIR}" ]]; then
+    log "Erro: Diretório de origem ${4:$SOURCE_DIR} não existe."
+    exit 1
+fi
+endsnippet
+
+snippet $? "Verificar o status do comando"
+# Verificar o status do backup
+if [ $? -eq 0 ]; then
+    echo -e "\e[1;32m${1:Sucesso}\e[0m"
+else
+    echo -e "\e[1;31m${2:Error}\e[0m"
+    exit 1
+fi
+endsnippet
+
+
+snippet log "Cria um log"
+# Função de log
+log() {
+    local message="\$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
+}
+endsnippet
+
+
+snippet diren "Verificar se o diretorio existe , caso nao ele cria um novo diretorio"
+# Verificar se o diretório de destino existe, cria se necessário
+if [ ! -d "$DESTINATION_DIR" ]; then
+    log "Diretório de destino $DESTINATION_DIR não encontrado. Criando..."
+    mkdir -p "$DESTINATION_DIR"
+    if [ $? -ne 0 ]; then
+        log "Erro: Falha ao criar o diretório de destino."
+        exit 1
+    fi
+fi
+endsnippet
+
+snippet tempfun "Cria um arquivo tempoario"
+criar_temp() {
+    local tipo="$1"   # "arquivo" ou "diretorio"
+    local prefixo="$2" # Prefixo opcional
+    local temp
+
+    if [[ "$tipo" == "diretorio" ]]; then
+        temp=$(mktemp -d "${prefixo:-/tmp/tempdir.XXXXXX}")
+        echo "Diretório temporário criado: $temp"
+    elif [[ "$tipo" == "arquivo" ]]; then
+        temp=$(mktemp "${prefixo:-/tmp/tempfile.XXXXXX}")
+        echo "Arquivo temporário criado: $temp"
+    else
+        echo "Uso: criar_temp <tipo> [prefixo]"
+        echo "  tipo: 'arquivo' ou 'diretorio'"
+        echo "  prefixo: (opcional) Exemplo: /tmp/meu_arquivo.XXXXXX"
+        return 1
+    fi
+
+    echo "$temp"
+}
+endsnippet
+
+snippet tempdir
+ temp=$(mktemp -d "${1:~/tmp/tempdir.XXXXXX}")
+endsnippet
+
+
+snippet tempfile
+ temp=$(mktemp "${1:~/tmp/tempdir.XXXXXX}")
+endsnippet
+
+snippet /fex?/ "if file exists" rb
+if [[ -e ${1:filename} ]]; then
+    echo "O arquivo '${1:filename}' existe."
+else
+    echo "O arquivo '${1:filename}' não existe."
+fi
+endsnippet
+
+snippet read "read -p" b
+        read -p ${1:MENSAGEM_PRINT}
+
+
+
+endsnippet
+
+
+
+snippet uninstall "Deslinstalar aplicativos" b
+# Removendo aplicação
+_uninstall() {
+    local package_name=\$1
+
+    if [[ -z "$package_name" ]]; then
+        echo "Erro: Nenhum nome de pacote fornecido."
+        echo "Uso: _uninstall <nome_do_pacote>"
+        return 1
+    fi
+
+    echo "Iniciando a desinstalação do pacote: $package_name"
+
+    # Removendo o pacote usando gerenciadores de pacotes comuns
+    if command -v apt &>/dev/null; then
+        sudo apt remove --purge -y "$package_name" && sudo apt autoremove -y
+    elif command -v yum &>/dev/null; then
+        sudo yum remove -y "$package_name"
+    elif command -v pacman &>/dev/null; then
+        sudo pacman -Rns "$package_name" --noconfirm
+    elif command -v dnf &>/dev/null; then
+        sudo dnf remove -y "$package_name"
+    elif command -v zypper &>/dev/null; then
+        sudo zypper remove -y "$package_name"
+    else
+        echo "Gerenciador de pacotes não suportado ou não encontrado."
+        return 2
+    fi
+
+    # Removendo arquivos de configuração no diretório padrão
+    echo "Removendo arquivos de configuração..."
+    config_dirs=("/etc/$package_name" "$HOME/.config/$package_name" "$HOME/.$package_name")
+    for dir in "${config_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            echo "Removendo $dir"
+            rm -rf "$dir"
+        fi
+    done
+
+    echo "Removendo cache e logs..."
+    cache_dirs=("/var/cache/$package_name" "/var/log/$package_name")
+    for dir in "${cache_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            echo "Removendo $dir"
+            sudo rm -rf "$dir"
+        fi
+    done
+
+    echo "Pacote $package_name desinstalado com sucesso!"
+}
+
+# Exemplo de uso
+# _uninstall nginx
+
+endsnippet
+
+snippet remove "remover programas" b
+# Removendo aplicação
+_uninstall() {
+    local package_name=\$1
+
+    if [[ -z "$package_name" ]]; then
+        echo "Erro: Nenhum nome de pacote fornecido."
+        echo "Uso: _uninstall <nome_do_pacote>"
+        return 1
+    fi
+
+    echo "Iniciando a desinstalação do pacote: $package_name"
+
+    # Verifica se está usando apt
+    if command -v apt &>/dev/null; then
+        echo "Usando apt para remover o pacote..."
+        sudo apt remove --purge -y "$package_name" && sudo apt autoremove -y
+    # Verifica se está usando pkg (usado no Termux)
+    elif command -v pkg &>/dev/null; then
+        echo "Usando pkg para remover o pacote..."
+        pkg uninstall -y "$package_name"
+    else
+        echo "Gerenciador de pacotes não suportado ou não encontrado (apt ou pkg)."
+        return 2
+    fi
+
+    echo "Removendo arquivos de configuração e cache relacionados..."
+    config_dirs=("/etc/$package_name" "$HOME/.config/$package_name" "$HOME/.$package_name")
+    for dir in "${config_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            echo "Removendo $dir"
+            rm -rf "$dir"
+        fi
+    done
+
+    echo "Removendo cache e logs..."
+    cache_dirs=("/var/cache/$package_name" "/var/log/$package_name")
+    for dir in "${cache_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            echo "Removendo $dir"
+            sudo rm -rf "$dir"
+        fi
+    done
+
+    echo "Pacote $package_name desinstalado com sucesso!"
+
+
+# Exemplo de uso
+# _uninstall nginx
+
+
+endsnippet
+
+snippet menu "Cria um menu"
+    echo "===== MENU ====="
+    echo "1. ${1:opção 1}"
+    echo "2. ${2:opção 2}"
+    echo "3. ${3: opcao 3}"
+    echo "4. ${4: opção 4}"
+    echo "5. ${5: Sair}"
+    echo "================"
+    read -p "Escolha uma opção: " opcao
+
+endsnippet
+
+snippet casemenu "Cria um case pro menu"
+case $opcao in
+        1) ${1:funcao1} ;;
+        2) ${2:funcao2};;
+        3) ${3:funcao3};;
+        4) ${4:funcao4};;
+        5) echo "Saindo..."; exit 0 ;;
+        *) echo "❌ Opção inválida. Tente novamente." ;;
+    esac
+
+endsnippet
+
+snippet opcao  "Escolha uma opção"
+read -p "Escolha uma opção: " opcao
+
+endsnippet
+
+
+snippet true "while true; do  ....; done"
+while true; do
+${1:COMANDOS}
+
+done
+endsnippet
+
+
+snippet cores "Cores Bash" b
+ vm='\e[1;31m'
+ vd='\e[1;32m'
+ am='\e[1;33m'
+ az='\e[1;34m'
+ mg=='\e[1;35m'
+ cy=='\e[1;36m'
+ fs='\e[1;30m'
+ rs='\e[0m'
+endsnippet
+
+
+snippet limparpay "Limpar payloads" b
+# LIMPA E FORMATA AS PAYLOADS
+limparPay() {
+    local server="$1"
+    sed 's/\[crlf\]/\r\n/g' | sed 's/\[lf\]/\n/g' | sed 's/\[host\]/'${server}'/g'
+}
+endsnippet
+
+snippet scan "scan de Proxy 101" b
+        # Formata a payload
+        formatted_payload=$(echo -e "$PAY" | limparPay "$servidor")
+
+        # Faz a busca pelo status usando curl
+        response=$(curl -m1 -s -o /dev/null -w "%{http_code}" --proxy "$ips:$porta" -X "$request" -d "$formatted_payload" "http://$servidor")
+
+        if [[ "$response" == "200" || "$response" == "101" ]]; then
+      # ONLINE
+            echo -ne "\e[1;32mPayload \e[1;37m[\e[1;32m$num\e[0m|\e[1;33m${#PAYLOADS[@]}\e[0m]: \033[1;37m"
+            echo -e "\e[1;30m$PAY\e[0m"
+            echo -ne '\e[0m'
+            echo -e "\033[1;33mResposta: \033[42;1;37m$response\033[0m"
+        else
+        # OFFLINE
+         echo -ne "\e[1;33mPayload \e[1;37m[\e[1;30m$num\e[0m|\e[1;33m${#PAYLOADS[@]}\e[0m]: \033[1;37m"
+            echo -ne "\033[1;41;37mOFFLINE"
+            echo -e '\e[0m'
+            echo "Resposta: $response"
+        fi
+endsnippet
+
+snippet offline "OFFLINE" b
+echo -ne "\033[1;41;37mOFFLINE"
+endsnippet
+
+snippet online "ONLINE" b
+echo -ne "\033[1;42;37mONLINE"
+endsnippet
+
+snippet payloads "PAYLOADS" b
+# payloads
+declare -A PAYLOADS=(
+    [PATCH]="GET / HTTP/1.1[crlf]Host: $servidor[crlf]Backend: app000[crlf]Upgrade: Websocket[crlf][crlf]"
+    [GET]="GET / HTTP/1.1[crlf]Host: timofertas.com[crlf][crlf]"
+
+[GRINGA1]="GET /cdn-cgi/trace HTTP/1.1[crlf]Host: tsel.me[crlf][crlf]CF-RAY / HTTP/1.1[crlf]Host: [host][crlf]Upgrade: Websocket[crlf]Connection: Keep-Alive[crlf]User-Agent: [ua][crlf]Upgrade: websocket[crlf][crlf]"
+)
+endsnippet
+
+
+snippet mkd "Cria o diretorio de destino"
+# Cria o diretório de destino, se não existir
+DESTINO="${1:diretorio/destino}"
+DATA=$(date +'%Y-%m-%d_%H-%M-%S')
+if [ ! -d "${1:$DESTINO}" ]; then
+    echo -e "\e[1;33mCriando o diretório de destino '$DESTINO'...\e[0m"
+    mkdir -p "${1:$DESTINO}"
+fi
+endsnippet
+
+
+snippet tar "tar -czf <DESTINO> -C <ORIGEM>"
+tar -czf "${1:$DESTINO}" -C "${2:$ORIGEM}" .
+if [ $? -eq 0 ]; then
+    echo "✔️ Backup concluído com sucesso!"
+    echo "Arquivo de backup: ${1:$DESTINO}"
+else
+    echo "❌ Falha ao realizar o backup."
+    exit 1
+fi
+
+endsnippet
+
+
+snippet filebkp "Cria um arquivo de backup"
+${1:fileBkp}_$DATA.txt
+endsnippet
+
+snippet dir? "Verifica se o diretório de origem existe"
+# Verifica se o diretório de origem existe
+if [ ! -d "${1:ORIGEM}" ]; then
+    echo "❌ O diretório de origem '${1:ORIGEM}' não existe."
+    exit 1
+fi
+endsnippet
+
+
+
+# PASTAS E DIRETORIOS
+snippet mke "Verifica se a pasta existe" b
+# verifica se a pasta já existe.
+${1:PATCH}="${2}"
+[[ -d $PATCH ]] && { echo "$PATCH Já existe"; }  
+endsnippet
+
+
+snippet mkn "Verifica se a pasta nao existe" b
+# verifica se a pasta já existe.
+${1:PATCH}="${2}"
+[[ ! -d $PATCH ]] && { echo "$PATCH não existe"; }  
+endsnippet
+
+snippet mks "Verifica se a pasta existe se nao." b
+# verifica se a pasta já existe, Se nao.
+${1:PATCH}="${2}"
+[[ -d $PATCH ]] && { echo "$PATCH Já existe"; } || { echo "$PATCH não existe"; }  
+endsnippet
+
+
+# SAUDAÇÃO COM BASE NO HORARIO
+snippet saudacao "Saudação com base no horario"
+# Obtém a hora atual no fuso horário de São Paulo
+hora=$(TZ=America/Sao_Paulo date +%H)
+minuto=$(TZ=America/Sao_Paulo date +%M)
+
+# Define as saudações com base no horário
+if [ "$hora" -ge 0 -a "$hora" -lt 12 ]; then
+    saudacao="Bom Dia"
+elif [ "$hora" -ge 12 -a "$hora" -lt 18 ]; then
+    saudacao="Boa Tarde"
+else
+    saudacao="Boa Noite"
+fi
+endsnippet
+
+
+# -------------------------------------------
+# PRINT DE MENSAGENS COLORIDAS
+# -------------------------------------------
+snippet msg_cor "enviar mensagem colorida"
+# FUNÇÃO PRA COLORIR AS MENSAGEM DO ECHO
+msg_cor(){
+case "\$1" in
+vm|vermelho)
+echo -e "\e[1;31m\$2\e[m"
+;;
+vd|verde)
+echo -e "\e[1;32m\$2\e[m"
+;;
+bd|bordo)
+echo -e "\e[1;35m\$2\e[m"
+;;
+am|amarelo)
+echo -e "\e[1;33m\$2\e[m"
+;;
+cy|cyano)
+echo -e "\e[1;36m\$2\e[m"
+;;
+az|azul)
+echo -e "\e[1;34m\$2\e[m"
+;;
+*)
+echo -e "\e[1;37m\$2\e[m"
+esac
+}
+endsnippet
+
+snippet set_color "Escolhe as cores das mensagens"
+# Função para gerenciar cores
+set_color() {
+    case "\$1" in
+        "reset") echo -e "\e[0m" ;;
+        "pt") echo -en "\e[30m" ;;
+        "vm") echo -en "\e[31m" ;;
+        "vd") echo -en "\e[32m" ;;
+        "am") echo -en "\e[33m" ;;
+        "az") echo -en "\e[34m" ;;
+        "mg") echo -en "\e[35m" ;;
+        "cy") echo -en "\e[36m" ;;
+        "br") echo -en "\e[37m" ;;
+        "bold") echo -en "\e[1m" ;;
+        "underline") echo -en "\e[4m" ;;
+        "invert") echo -en "\e[7m" ;;
+        *) echo "" ;;
+    esac
+}
+endsnippet
+
+
+# ----------------------------
+# CRIAÇÃO DE USUARIO ALEATORIO
+# ----------------------------
+snippet usuario "Cria um usuario em random"
+usuario="teste$((RANDOM % 250 + 1))"
+endsnippet
+
+snippet user "Cria um usuario em random"
+usuario="teste$((RANDOM % 250 + 1))"
+endsnippet
+
+snippet user1 "Gerar um usuario aleatório de 5a6 caracteres (letras minusculas)"
+# Gerar um usuário aleatório de 5 a 6 caracteres (apenas letras minúsculas e números)
+usuario="mau$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 5 | head -n 1)"
+endsnippet
+
+snippet user2 "Gerar um usuário aleatório de 5 a 6 caracteres"
+# Gerar um usuário aleatório de 5 a 6 caracteres (letras minúsculas, números e base64)
+usuario="Mau$(head /dev/urandom | tr -dc 'a-z0-9' | head -c 5 ; echo '')$(head /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 1)"
+endsnippet
+
+# ---------------------
+# CRIAR SENHA ALEATORIA
+# ---------------------
+snippet pass "Gerar uma senha aleatoria"
+# Gerar uma senha aleatorio
+senha="$((RANDOM % 99999 + 10))"
+endsnippet
+
+snippet senha "Cria uma  senha em random"
+# Gerar uma  senha aleatoria
+senha="$((RANDOM % 99999 + 10))"
+endsnippet
+
+snippet dias "Adiciona numero de dias na data"
+tuserdate=$(date '+%Y/%m/%d' -d "+${1:31} days")
+endsnippet
+
+snippet passvps "Criar login e pass na vps"
+# Verifica se a conexão SSH pode ser estabelecida
+    if sshpass -p "$senhaServer" ssh -p "$porta" -o ConnectTimeout=2 -o StrictHostKeyChecking=no root@$ipServer echo "ok" 1>/dev/null 2>/dev/null; then
+        sshpass -p "$senhaServer" ssh -p "$porta" -o ConnectTimeout=2 -o StrictHostKeyChecking=no root@$ipServer << EOF >/dev/null 2>&1
+./atlascreate.sh $usuario $senha 2 1
+EOF
+endsnippet
+
+
+snippet sshtest "Testar servidor ssh"
+# Verifica se a conexão SSH pode ser estabelecida
+usuario="${1:usuario_servidor}"
+senhasServer="${2:senha_servidor}"
+porta=${3:22}
+    if sshpass -p "$senhaServer" ssh -p "$porta" -o ConnectTimeout=2 -o StrictHostKeyChecking=no root@$ipServer echo "ok" 1>/dev/null 2>/dev/null; then
+	echo "Ssh Conectado"
+	else
+	echo "Impossivel Conectar"
+	fi
+endsnippet
+
+
+snippet operadoras "printa operadoras na tela"
+echo -e "🔴CLARO 🟣VIVO 🔵TIM 🟡Oi\n"
+endsnippet
+
+
+snippet servidores "Cria os servidores"
+# Definindo o array de servidores
+declare -A SERVIDORES=(
+    [servidor1]="${1:IP_SERVIDOR}:${2:22} malvadao"
+    [servidor2]="${3:IP_SERVIDOR}:${4:22} mauvadao"
+    # Adicione mais servidores aqui se necessário
+)
+
+# Extrai informações do servidor
+ipPorta="${SERVIDORES[$servidor]%% *}"
+senhaServer="${SERVIDORES[$servidor]#* }"
+# Extrai o IP e a porta do servidor
+ipServer="${ipPorta%:*}"
+porta="${ipPorta#*:}"
+
+endsnippet
+
+
+
+
+
+# -------------------------------------
+# MOSTRANDO MENSAGEM DE USUARIO E SENHA
+# -------------------------------------
+snippet verusuario "Mostra o usuario e senha na tela"
+    cat <<EOF
+
+🎉 CONTA CRIADA COM SUCESSO! 🎉
+
+🌍 Servidor: 𝐁𝐫𝐚𝐬𝐢𝐥𝐞𝐢𝐫𝐨
+👤 Login: <code>$usuario</code>
+🔑 Senha: <code>$senha</code>
+📲 Limite: 1
+🗓️ Expira em: $tempo Dia(s)
+
+*⚠️ ENTRAR COM INTERNET PARA ATUALIZAR APLICATIVO ⚠️*
+*🚫 PROIBIDO TORRENT 🚫*
+*🚀 USE SEM MEDO 🕹*
+
+Mais informações @mauvadao
+EOF
+
+endsnippet
+
+
+snippet check_host "Função de checar host online"
+# Função para verificar se o host está online
+check_host() {
+    host=\$1
+
+ domi="${1:dominio.xyz}"
+range=$host
+port=80
+tempo=2
+request=PATCH
+
+  try=$(curl -m $tempo -s -o /dev/null -w "%{http_code}" -X $request $domi -H "Upgrade: websocket" -x ${range}:$port)
+
+    if [[ $try = 101 ]]
+    then
+    echo -e "\e[01;33m$host\e[0m | \e[01;37mIP OK - STATUS $try\e[0m"
+
+    #Gravando no file OK.txt
+    echo "$host | $try" >> OK.txt
+
+        else
+    echo -e "$host | \e[01;31mSTATUS $try\e[0m"
+
+    fi
+}
+endsnippet
+
+
+# USER AGENT
+snippet firefox "User agente firefox"
+# User-Agent do Mozilla
+USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+endsnippet
+
+# TESTES DE CONEXAO WEBSOCKT
+snippet websockt "Payload pra teste de cabeçalho websockt"
+# Cabeçalho WebSocket
+HOST="${1:dominio.xyz}"
+HEADER="GET / HTTP/1.1\r\nHost: $HOST\r\nConnection: Upgrade\r\nUpgrade: websocket\r\n\r\n"
+endsnippet
+
+
+snippet scp "Envia um arquivo entre servidores"
+# FERRAMENTA DE UPLOAD E DOWNLOAD ENTRE SERVIDORES
+	arquivo="${1:file.txt}"
+	servidor="${2:servidor}"
+	porta=${3:22}
+	scp -P $porta "$arquivo" "$servidor"
+endsnippet
+
+
+
+#  FERRAMENTA DE DOWNLOAD E UPLOAD ENTRE SERVIDORES
+
+snippet scpfun  "upload e download entre servidores remotos"
+# Função para copiar diretório do servidor para local
+copiar_diretorio_servidor() {
+    local diretorio_servidor=\$1
+    scp -r -P $porta "$usuario@$ip:$diretorio_servidor" .
+}
+endsnippet
+
+snippet scpdir "Upload de todos arquivos de  um diretorio"
+# Função para enviar tudo do diretório atual
+enviar_tudo_diretorio_atual() {
+    scp -r -P $porta * "$SERVIDOR"
+}
+endsnippet
+
+snippet scpzip "Envia um rar ou zip ao servidor"
+# Função para enviar um arquivo .zip ou .rar
+enviar_arquivo_compactado() {
+    local arquivo=\$1
+    scp -P $porta "$arquivo" "$SERVIDOR"
+}
+endsnippet
+
+snippet scpfile  "Envia um arquivo ao servidor"
+# Função para enviar um arquivo
+enviar_arquivo() {
+
+SERVIDOR="${1:SERVIDOR}"
+porta="${1:22}"
+arquivo="${3:ARQUIVO}"
+
+scp -P $porta "$arquivo" "$SERVIDOR"
+}
+endsnippet
+
+snippet spcpasta "Envia uma  pasta ao servidor"
+# Função para enviar uma pasta
+enviar_pasta() {
+    local pasta=\$1
+    scp -r -P $porta "$pasta" "$SERVIDOR"
+}
+endsnippet
+
+snippet scprar "Compacta um diretorio e envia ao servidor"
+# Função para compactar diretório e enviar
+compactar_enviar() {
+    local diretorio=\$1
+	local SERVIDOR="${1:SERVIDOR_REMOTO}"
+    zip -r diretorio.zip "$diretorio"
+    scp -P $porta "diretorio.zip" "$SERVIDOR"
+    rm "diretorio.zip"
+}
+endsnippet
+
+snippet server "Array com servidores"
+# Array associativo com informações dos servidores
+declare -A servers=(
+    ["canada"]="{$1:IP_SERVIDOR}:root:{$2:22}:${3:SENHA_SERVIDOR}"
+    ["hostinger"]="${4:IP_SERVIDOR}:${5:USUARIO_SERVIDOR}:${6:65002}:${7:SENHA_SERVIDOR}"
+# Adicione mais servidores conforme nescessidades
+)
+endsnippet
+
+
+
+
+# CHAT IDS TELEGRAM
+snippet chat "chat ids do telegram"
+#  CHAT_ID TELEGRA.
+declare -A chatIds=(
+
+["mauvadao"]="2050411579"
+["canal"]="-1001674207641"
+["grupo"]="-1001610311219"
+["secundario"]="-1001179008300"
+)
+endsnippet
+
+
+
+# ==================
+# INSTALANDO PACOTES
+# ==================
+# instalar pacotes nao instalado
+snippet pacotesn "Instala pacotes contidos em um  array"
+ echo -e "\e[1;36mInstalando pacotes no sistema\e[0m"
+ # Pacotes pra instalar
+ pacotes=(
+'${1:aplicação1}'
+'${2:aplicação2}'
+'${3:aplicação3}'
+
+# Adicione mais aplicações conforme nescessidades
+)
+
+for prog in ${pacotes[@]}; do
+# Verificando os pacotes e instalando no sistema
+if ! command -v ${prog} &>/dev/null; then
+    echo -e "\e[44;1;37m${prog}:\e[0m \e[1;33minstalando aplicação no sistema\e[0m"
+apt install -y "${prog}"
+fi
+
+done
+endsnippet
+
+
+# mostrar pacotes instalados
+snippet pacotes "Instala pacotes contidos em um  array"
+ echo -e "\e[1;36mInstalando pacotes no sistema\e[0m"
+ # Pacotes pra instalar
+ pacotes=(
+'${1:aplicação1}'
+'${2:aplicação2}'
+'${3:aplicação3}'
+# Adicione mais aplicações conforme nescessidades
+)
+
+for prog in ${pacotes[@]}; do
+# Verificando os pacotes e instalando no sistema
+if  command -v ${prog} &>/dev/null; then
+    echo -e "\e[44;1;37m${prog}:\e[0m \e[1;33mpacote já instalado no sistema\e[0m" 
+
+else	
+echo -e "\e[44;1;37m${prog}:\e[0m \e[1;32mInstalando pacote no sistema\e[0m"
+apt install -y "${prog}"
+fi
+
+done
+endsnippet
+
+
+
+# MENSAGENS
+snippet error "❌ ERROR"
+echo -e "\e[1;31m[❌]${1:ERROR}[❌]\e[0m"
+endsnippet
+
+snippet sucess "✔️ Sucesso"
+echo -e "\e[1;32m[✔️]${1:Sucesso[✔️]}\e[0m"
+endsnippet
+
+
+snippet sucesso "Sucesso"
+echo -e "\e[1;32mSucesso\e[0m"
+endsnippet
+
+
+snippet erro "Error"
+echo -e "\e[1;31mError\e[0m"
+endsnippet
+
+snippet concluido "Instalacao concluida " b
+    echo -e "        \033[1;33m • \033[1;32mINSTALACAO CONCLUIDA\033[1;33m • \033[0m"
+    echo ""
+endsnippet
+
+snippet informacoes "mais informacoes" b
+    echo -e "\033[1;33m MAIS INFORMACOES \033[1;31m(\033[1;36mTELEGRAM\033[1;31m): \033[1;37m@${1:MAUVADAO}\033[0m"
+endsnippet
+
+
+snippet atencao "ATENCAo" b
+        echo -e "                 \033[1;33m• \033[1;31mATENCAO \033[1;33m• \033[0m"
+        echo ""
+endsnippet
+
+snippet title "Desc Snipp" b
+echo -e "\033[1;41m${1:TITLE}\033[0m"
+endsnippet
+
+snippet msg "Mostra memsagem"
+echo -e "\e[1;32m${1:MENSAGEM}\e[0m"
+endsnippet
+
+snippet msg1 "msg1" b
+        echo -e "\033[1;37m[\033[1;31m\033[1;37m] \033[1;33m${1:MENSAGEM}\033[0m"
+endsnippet
+
+snippet msg2 "2 Mensagems" b
+        echo -e "\033[1;33m${1:MENSAGEM1} \033[1;32m${2:MENSAGEM2} \033[0m"
+endsnippet
+
+snippet 0m "\33[0m" b
+echo -ne "\033[0m"
+endsnippet
+
+
+# VERIFICAÇOES 
+# Verifica se um parametro está vazio
+snippet vazio "Verificar se parâmetro está vazio" b
+[[ -z "${1:\$1}" ]] && { echo "Uso: :\$0 ${2:<parametros>}"; exit 0; }
+endsnippet
+
+snippet -z "Verificar se parâmetro está vazio" b
+# Verifica se um paratro está vazio
+[[ -z "${1:\$1}" ]] && { echo "Uso: :\$0 ${2:<parametros>}"; exit 0; }
+endsnippet
+
+snippet -n "Verificar se parâmetro está em uso " b
+# Verifica se uma variavel está em uso
+[[ -n "${1:\$1}" ]] && { ${2:COMANDOS}"; }
+endsnippet
+
+# CABEÇALHOS
+snippet titulo "Print do titulo no topo"
+# Printa um cabeçalho
+echo -e "\033[1;34m+-------------------------------------------------------+\033[0m"
+echo -e "\033[1;34m| \033[1;37m${1:PARAMETROS}             \033[1;34m|\033[0m"
+echo -e "\033[1;34m+-------------------------------------------------------+\033[0m"
+echo
+endsnippet
+
+
+snippet logo "MauDaVpn"
+echo -ne '\e[1;35m'
+figlet ${1:MauDaVpn}
+echo -ne '\e[0m'
+endsnippet
+
+snippet maudavpn "MauDaVpn"
+echo -ne '\e[1;34m'
+figlet ${1:MauDaVpn}
+echo -ne '\e[0m'
+endsnippet
+
+
+
+# mostrar Linhas
+snippet lin "Mostrando linhas" b
+echo -e "\n\033[0;34m═════════════════════════════════════════════════\033[0m"
+endsnippet
+
+# mostrar Linhas
+snippet lin1 "Mostrando linhas" b
+echo -e "\n\033[0;34m═════════════════════════════════════════════════\033[0m"
+endsnippet
+
+
+snippet lin2 "Cria uma linha  ----" b
+echo -e "\033[1;34m+-------------------------------------------------------+\033[0m"
+endsnippet
+
+snippet kirito "script kirito" b
+kirito="https://raw.githubusercontent.com/kiritosshxd/SSHPLUS/master/Plus"
+endsnippet
+
+
+snippet root "Verificar root" b
+[[ "$(whoami)" != "root" ]] && {
+    echo -e "\033[1;33m[\033[1;31mErro\033[1;33m] \033[1;37m- \033[1;33mvocê precisa executar como root\033[0m"
+    exit 0
+}
+endsnippet
+
+snippet funbar "function funbar" b
+fun_bar() {
+    comando[0]="\$1"
+    comando[1]="\$2"
+    (
+        [[ -e $HOME/fim ]] && rm $HOME/fim
+        ${comando[0]} -y >/dev/null 2>&1
+        ${comando[1]} -y >/dev/null 2>&1
+        touch $HOME/fim
+    ) >/dev/null 2>&1 &
+    tput civis
+    echo -ne "  \033[1;33mAGUARDE \033[1;37m- \033[1;33m["
+    while true; do
+        for ((i = 0; i < 18; i++)); do
+            echo -ne "\033[1;31m#"
+            sleep 0.1s
+        done
+        [[ -e $HOME/fim ]] && rm $HOME/fim && break
+        echo -e "\033[1;33m]"
+        sleep 1s
+        tput cuu1
+        tput dl1
+        echo -ne "  \033[1;33mAGUARDE \033[1;37m- \033[1;33m["
+    done
+    echo -e "\033[1;33m]\033[1;37m -\033[1;32m OK !\033[1;37m"
+    tput cnorm
+}
+endsnippet
+
+
+snippet pct "instalar pacotes" b
+    inst_pct() {
+        _pacotes=( ${1: "xclip" "bc" "screen" "nano" "unzip" "lsof" "netstat" "net-tools" "dos2unix" "nload" "jq" "curl" "figlet" "python3" "python-pip" "python" "at"})
+        for _prog in ${_pacotes[@]}; do apt install $_prog -y done
+        pip install speedtest-cli
+    }
+    fun_bar 'inst_pct'
+
+endsnippet
+
+
+# Verificando se o .zip está legivel ou corrompido
+snippet testunzip "Testar se o .zip está legivel"
+file="${1:file.zip}"
+unzip -t "$file"
+endsnippet
+
+snippet test7z "Testar se o  .zip está legivel com 7z"
+file="${1:file.zip}"
+7z t "$file"
+endsnippet
+
+snippet testzip "Testar um .zip  se está legivel com zip -T"
+file=${1:file.zip}
+zip -T  "$file"
+endsnippet
+
+snippet test? "[[ $? == 0 ]]"
+    # Verificando uma condição
+    [[ $? == 0 ]] && { ${1:COMANDOS}; }
+endsnippet
+
+
+snippet test?| "[[ $? == 0 ]]"
+    # Verificando uma condição
+    [[ $? == 0 ]] && { ${1:COMANDOS}; } || { ${2:COMANDOS}; }
+endsnippet
+
+snippet rename "Renomeia os arquivos"
+# Função para renomear os arquivos com a extensão fornecida
+_rename() {
+    # Verifica se o parâmetro foi fornecido
+    if [ -z "\$1" ]; then
+        echo "Por favor, forneça uma extensão (exemplo: jpg, json)."
+        return 1
+    fi
+
+    # Extensão fornecida pelo usuário
+    extension=\$1
+
+    # Contador inicial
+    count=1
+
+    # Loop pelos arquivos com a extensão fornecida
+    for file in *.$extension; do
+        # Verifica se o arquivo realmente existe
+        if [ -f "$file" ]; then
+            # Formatar o novo nome com a extensão
+            new_name=$(printf "file-%02d.%s" "$count" "$extension")
+            
+            # Renomear o arquivo
+            mv "$file" "$new_name"
+            
+            # Incrementar o contador
+            count=$((count + 1))
+        fi
+    done
+}
+
+# Exemplo de uso
+# _rename jpg
+# _rename json
+endsnippet
+
+
+snippet ren "Renomeando os arquivos"
+# Função para renomear arquivos
+_rename() {
+    local extension="\$1"
+    local count=1
+
+    # Verifica se a extensão foi fornecida
+    if [[ -z "$extension" ]]; then
+        echo "Uso: _rename <extensão>"
+        return 1
+    fi
+
+    # Loop pelos arquivos da extensão fornecida
+    for file in *."$extension"; do
+        # Verifica se há arquivos com a extensão
+        if [[ ! -e "$file" ]]; then
+            echo "Nenhum arquivo com extensão .$extension encontrado."
+            return 1
+        fi
+
+        # Gera o novo nome
+        local new_name=$(printf "fundo-%02d.%s" "$count" "$extension")
+        
+        # Renomeia o arquivo
+        mv "$file" "$new_name"
+        
+        # Incrementa o contador
+        count=$((count + 1))
+    done
+
+    echo "Arquivos .$extension renomeados com sucesso!"
+}
+
+# Exemplo de uso direto no script
+# _rename jpg
+endsnippet
+
+snippet renjpg "Renomeia os arquivos jpg"
+	count=1; for file in *-m.jpg; do new=$(printf "fundo-%02d.jpg" "$count");  echo "mv $file $new"; count=$((count + 1));  sleep 1; done
+endsnippet
+
+
+snippet  renfiles "Renomeia files"
+#  RENOMEAR ARQUIVOS
+nome="\$1"
+ext="\$2"
+contador=1
+
+# verificar se foi passado algum parametro
+[[ -z \$1 ]] && { echo "Uso: bash \$0 <novo-nome> <extensao>"; exit 0; }
+
+while read file; do
+
+novo_nome="${nome}-${contador}.${ext}"
+
+echo "$file" | sed -rn "s/(.*).${ext}/mv & ${novo_nome}/gp"
+
+
+((contador++))
+
+ done <<<$(ls *.${ext})
+endsnippet
+
+snippet txtforjson "Move tudo .txt para .json"
+	# Renomeia *.txt para *.json
+	ls *.txt  | sort -uV| sed -rn 's/(.*).txt$/mv "&" \1.json/gp' | xargs -I {} bash -c {}
+endsnippet
+
+
+snippet jsonfortxt "Move tudo .json para .txt"
+	# Renomeia *.json para *.txt
+	ls *.json  | sort -uV| sed -rn 's/(.*).json$/mv "&" \1.txt/gp' | xargs -I {} bash -c {}
+endsnippet
+
+
+# REPOSITORIOS MAUVADAO
+snippet maudovim "repositorio: maudovim"
+git clone https://github.com/mauvadao4g/maudovim.git
+endsnippet
+
+snippet repodomau "Repositorio: RepoDoMau"
+git clone https://github.com/mauvadao4g/RepoDoMau.git
+endsnippet
+
+
+# EMOJS
+snippet claro "🔴CLARO"
+🔴CLARO
+endsnippet
+
+snippet vivo "🟣VIVO"
+🟣VIVO
+endsnippet
+
+snippet vivo2 "💜"
+💜
+endsnippet
+
+snippet tim "🔵TIM"
+🔵TIM
+endsnippet
+
+snippet valido "💙"
+💙VALIDO
+endsnippet
+
+
+snippet oi "🟡Oi"
+🟡Oi
+endsnippet
+
+snippet fluk "🟠"
+🟠FLUK
+endsnippet
+
+snippet 18 "🔞"
+🔞
+endsnippet
+
+
+#  NOVOS SNIPPETS
+snippet color_message "Colorir mensagens"
+# Função para exibir mensagens coloridas
+function colored_message() {
+    local color_code=\$1
+    shift
+    echo -e "\033[1;${color_code}m$*\033[0m"
+	# uso: colored_message 33 'Sua mensagem'
+}
+endsnippet
+
+
+snippet local_dir "Verificar se uma pasta existe"
+# Verificar se a pasta local existe
+if [ ! -d "$LOCAL_DIR" ]; then
+    echo -e  "\033[1;31m[ERRO] A pasta '$LOCAL_DIR' não foi encontrada.\033[0m"
+    exit 1
+fi
+endsnippet
+
+snippet scpbkp "Envair o arquivo para o servidor"
+# Configuração do servidor
+declare -A SERVERS
+SERVERS["${1:SERVIDOR_NAME}"]="${2:SERVIDOR_IP}:${3:SERVIDOR_USER}:${4:SERVIDOR_PORTA}:${5:PASSWORD}"
+
+# Nome do servidor para envio
+SERVER_NAME="${6:SERVIDOR_NAME}"
+
+# Obter informações do servidor
+IFS=":" read -r HOST USER PORT PASSWORD <<< "${SERVERS[$SERVER_NAME]}"
+
+# Enviar o arquivo para o servidor usando scp e sshpass
+echo -e "\033[1;33m[INFO] Enviando '$ZIP_FILE' para o servidor '$SERVER_NAME' usando SCP...\033[om"
+if sshpass -p "$PASSWORD" scp -P "$PORT" "$ZIP_FILE" "$USER@$HOST:"; then
+    colored_message "32" "[SUCESSO] Arquivo '$ZIP_FILE' enviado para '$SERVER_NAME' com sucesso."
+else
+echo -e  "\e[1;31m[ERRO] Falha ao enviar o arquivo para '$SERVER_NAME'.\e[0m"
+    exit 1
+fi
+endsnippet
+
+snippet server_info "Informações do servidor"
+# Configuração do servidor
+declare -A SERVERS
+SERVERS["${1:SERVER_NAME}"]="${2:SERVER_IP}:${3:SERVER_USER}:${4:SERVER_PORTA}:${5:PASSWORD}"
+
+# Nome do servidor para envio
+SERVER_NAME="${6:SERVER_NAME}"
+
+# Obter informações do servidor
+IFS=":" read -r HOST USER PORT PASSWORD <<< "${SERVERS[$SERVER_NAME]}"
+endsnippet
+
+
+snippet rsync "Enviar arquivos ao servidor"
+# Enviando arquivo pro servidor remoto
+rsync -havv -e "ssh -p 22"   ${1:/pasta/local} ${3:usuario@ip_servidor:/pasta/destino}
+endsnippet
+
+snippet server?  "Testar a conectividade com o servidor"
+
+# Função para testar a conectividade com o servidor
+testar_conectividade() {
+    local servidor="\$1"
+    local porta="\$2"
+
+    # Verifica se o endereço do servidor foi informado
+    if [[ -z "$servidor" ]]; then
+        echo "Erro: É necessário informar o endereço do servidor."
+        return 1
+    fi
+
+    # Testa conectividade com ping
+    echo "Testando conectividade com $servidor..."
+    if ping -c 3 "$servidor" > /dev/null 2>&1; then
+        echo "✅ Ping bem-sucedido para $servidor."
+    else
+        echo "❌ Não foi possível alcançar o servidor $servidor via ping."
+        return 2
+    fi
+
+    # Testa conexão com a porta, se especificada
+    if [[ -n "$porta" ]]; then
+        echo "Testando conexão na porta $porta..."
+        if nc -z -v -w 5 "$servidor" "$porta" > /dev/null 2>&1; then
+            echo "✅ Conexão bem-sucedida na porta $porta de $servidor."
+        else
+            echo "❌ Não foi possível conectar na porta $porta de $servidor."
+            return 3
+        fi
+    fi
+
+    echo "Conectividade testada com sucesso."
+    return 0
+}
+
+# Exemplo de uso da função
+testar_conectividade "192.168.1.1" "22"
+endsnippet
+
+snippet ssh? "Testar a conexao co o ssh"
+# Função para testar conexão SSH
+testar_ssh() {
+    local servidor="\$1"
+    local usuario="\$2"
+    local porta="\${3:-22}"  # Porta padrão 22
+
+    # Verifica se o servidor e usuário foram informados
+    if [[ -z "$servidor" || -z "$usuario" ]]; then
+        echo "Erro: Informe o servidor e o usuário para testar a conexão SSH."
+        echo "Uso: testar_ssh <servidor> <usuario> [porta]"
+        return 1
+    fi
+
+    echo "Testando conexão SSH com $usuario@$servidor na porta $porta..."
+    
+    # Tenta se conectar ao servidor via SSH
+    ssh -q -o ConnectTimeout=5 -p "$porta" "$usuario@$servidor" exit
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Conexão SSH bem-sucedida com $usuario@$servidor na porta $porta."
+        return 0
+    else
+        echo "❌ Falha ao conectar via SSH com $usuario@$servidor na porta $porta."
+        return 2
+    fi
+}
+
+# Exemplo de uso da função
+testar_ssh "192.168.1.1" "seu_usuario" "22"
+endsnippet
+
+
+snippet speedtest "Testar velocidade da internet"
+#!/bin/bash
+
+# Função para testar a velocidade da conexão
+testar_velocidade() {
+    # Verifica se o speedtest-cli está instalado
+    if ! command -v speedtest-cli &> /dev/null; then
+        echo "❌ O speedtest-cli não está instalado. Instalando agora..."
+        # Tenta instalar o speedtest-cli
+        if command -v apt &> /dev/null; then
+            sudo apt update && sudo apt install -y speedtest-cli
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y speedtest-cli
+        else
+            echo "❌ Gerenciador de pacotes não suportado. Instale manualmente o speedtest-cli."
+            return 1
+        fi
+    fi
+
+    echo "✅ speedtest-cli encontrado. Iniciando o teste de velocidade..."
+
+    # Executa o teste de velocidade
+    speedtest-cli --simple
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Teste de velocidade concluído com sucesso."
+    else
+        echo "❌ Falha ao executar o teste de velocidade."
+    fi
+}
+
+# Exemplo de uso da função
+testar_velocidade
+endsnippet
+
+
+
+snippet curl_dow "Baixar arquivos de uma url"
+# Função para baixar um arquivo de uma URL
+baixar_arquivo() {
+    local url=\$1
+    local destino=\${2:-$(basename "$url")}
+
+    # Verificar se curl está instalado
+    if ! command -v curl &> /dev/null; then
+        echo "Erro: curl não está instalado."
+        return 1
+    fi
+
+    echo "Baixando: $url"
+    echo "Salvando em: $destino"
+
+    # Usar curl com suporte a recomeçar downloads e mostrar progresso
+    curl -C - -# -o "$destino" "$url"
+
+    # Verificar se o download foi bem-sucedido
+    if [[ $? -eq 0 ]]; then
+        echo "Download concluído com sucesso!"
+    else
+        echo "Erro durante o download. Verifique sua conexão ou a URL."
+    fi
+}
+
+# Exemplo de uso
+# baixar_arquivo "https://example.com/arquivo.zip" "arquivo_baixado.zip"
+endsnippet
+
+
+snippet baixando "Mostra total de videos sendo baixado" 
+echo -e "\e[1;31m[\e[1;44;33m$num\e[0m||\e[1;44;32m$total\e[0m\e[1;31m]\e[1;34mBaixando:\e[0m \e[1;33m$line\e[0m" 
+endsnippet
+
+snippet lista "Le uma lista.txt"
+# Lendo as linhas de um file.txt
+lista="\${1:-lista.txt}"
+num=1
+total=$(cat $lista | sort -u | wc -l)
+while read line
+do
+echo -e "\e[1;31m[\e[1;44;33m$num\e[0m||\e[1;44;32m$total\e[0m\e[1;31m]\e[1;34mLinha:\e[0m \e[1;33m$line\e[0m"; echo
+
+${1:COMANDOS}
+sleep 1
+((num++))
+done < "$lista"
+endsnippet
+
+
+
+snippet _baixar "Função pra downloads com yt-dlp"
+# função pra downloads de videos url com yt-dlp
+_baixar(){
+	formato="\$1"
+	url="\$2"
+	cookies="$HOME/Downloads/cookies.txt "
+	agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+	# comando pra download
+	yt-dlp --cookies $cookies --user-agent "$agent"  -f "$formato" "$url" -o '%(title)s-%(id)s.%(ext)s'
+}
+endsnippet
+
+
+snippet _qualidade "Funçao pra formatos do yt-dlp"
+_qualidade(){
+# echo "Listando formatos de videos"
+# echo
+qualidade="\$1"
+url="\$2"
+# BAIXA O JSON COM AS INFORMAÇÕES DE VIDEOS
+# yt-dlp --no-warnings  "$url" -j | jq '.fulltitle, .webpage_url, .filesize_approx, .format, .format_id , .format_note, ._type, .height, .resolution'
+
+# BAIXA A LISTA DE FORMATOS DO ARQUIVO
+lista=$(yt-dlp -F --no-warnings  "$url" | \
+awk '{print $\1, \$2, \$3,  $NF}' | \
+grep mp4 | \
+grep "$qualidade" | \
+sort -uV \
+)
+endsnippet
+
+snippet formato "Formatos yt-dlp"
+# Formatos de videos
+	f720="bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/bestvideo[ext=mp4]"
+	f1080="bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/bestvideo[ext=mp4]"
+endsnippet
+
+
+snippet yt "Comando pra baixar os videos yt-dlp"
+	yt-dlp --cookies "$HOME/Downloads/cookies.txt" --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/bestvideo[ext=mp4]" "${1:http://youtube.com/watch=}" -o "%(title)s-%(id)s.%(ext)s" '
+endsnippet
+
+
+
+snippet colors "Cores em bash script"
+##################### Colours ############################
+TITLE=$(echo -e "\033[1;44m")
+ON_BLUE=$(echo -e "\033[44m")
+RED=$(echo -e "\033[1;31m")
+GREEN=$(echo -e "\033[1;32m")
+YELLOW=$(echo -e "\033[1;33m")
+BLUE=$(echo -e "\033[1;34m")
+MAGENTA=$(echo -e "\033[1;35m")
+CYAN=$(echo -e "\033[1;36m")
+WHITE=$(echo -e "\033[1;37m")
+BLACK=$(echo -e "\033[1;30m")
+STD=$(echo -e "\033[0m") # Clear colour
+# Exemplo de uso
+echo "${RED} Message${STD}"
+##############################################################
+endsnippet
+
+snippet title "Titulo"
+	echo -e "\E[38;5;118m ${1:TITULO}"
+endsnippet
+
+
+
+
+
+####################################################
+# vim:ft=snippets:
+
+
